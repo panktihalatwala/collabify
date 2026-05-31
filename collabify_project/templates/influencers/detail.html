@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile.user.get_full_name }} — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+    <!-- Cover -->
+    <div class="h-48 bg-gradient-to-br from-violet-500 to-purple-700 rounded-3xl mb-0 relative overflow-hidden">
+        {% if profile.cover_image %}
+        <img src="{{ profile.cover_image.url }}" class="w-full h-full object-cover" alt="">
+        {% endif %}
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 -mt-6 relative z-10 px-8 pb-8">
+        <div class="flex flex-col md:flex-row items-start gap-6 pt-0">
+            <!-- Avatar -->
+            <div class="-mt-10">
+                {% if profile.user.avatar %}
+                <img src="{{ profile.user.avatar.url }}"
+                    class="w-24 h-24 rounded-2xl object-cover ring-4 ring-white shadow-lg" alt="">
+                {% else %}
+                <div
+                    class="w-24 h-24 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl ring-4 ring-white shadow-lg flex items-center justify-center">
+                    <span class="text-white text-3xl font-bold">{{ profile.user.first_name|first|upper }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="flex-1 pt-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{{
+                            profile.user.get_full_name|default:profile.user.username }}</h1>
+                        <p class="text-violet-600 font-medium capitalize">{{ profile.niche }} Creator</p>
+                        {% if profile.user.location %}<p class="text-sm text-gray-500">📍 {{ profile.user.location }}
+                        </p>{% endif %}
+                    </div>
+                    <div class="flex gap-3">
+                        {% if user.is_authenticated and user.is_brand_user %}
+                        <a href="/messaging/start/{{ profile.user.pk }}/" class="btn-primary text-sm">💬 Message</a>
+                        <a href="/campaigns/request/{{ profile.pk }}/" class="btn-secondary text-sm">🤝 Collaborate</a>
+                        <button id="bookmark-btn" data-influencer-id="{{ profile.pk }}"
+                            data-bookmarked="{% if is_bookmarked %}true{% else %}false{% endif %}"
+                            class="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors text-lg">
+                            {% if is_bookmarked %}🔖{% else %}🤍{% endif %}
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                    <div class="bg-violet-50 rounded-xl p-3 text-center">
+                        <p class="text-xl font-bold text-violet-700">{{ profile.followers_count|floatformat:0 }}</p>
+                        <p class="text-xs text-gray-500">Followers</p>
+                    </div>
+                    <div class="bg-green-50 rounded-xl p-3 text-center">
+                        <p class="text-xl font-bold text-green-700">{{ profile.engagement_rate }}%</p>
+                        <p class="text-xs text-gray-500">Engagement</p>
+                    </div>
+                    <div class="bg-yellow-50 rounded-xl p-3 text-center">
+                        <p class="text-xl font-bold text-yellow-700">{{ profile.avg_rating }}★</p>
+                        <p class="text-xs text-gray-500">Rating</p>
+                    </div>
+                    <div class="bg-blue-50 rounded-xl p-3 text-center">
+                        <p class="text-xl font-bold text-blue-700">{{ profile.total_collaborations }}</p>
+                        <p class="text-xs text-gray-500">Collabs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bio -->
+        {% if profile.user.bio %}
+        <div class="mt-6 pt-6 border-t border-gray-100">
+            <h2 class="font-bold text-gray-900 mb-2">About</h2>
+            <p class="text-gray-600 leading-relaxed">{{ profile.user.bio }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Pricing -->
+        <div class="mt-6 pt-6 border-t border-gray-100">
+            <h2 class="font-bold text-gray-900 mb-3">Collaboration Pricing</h2>
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 bg-violet-100 text-violet-700 rounded-xl font-semibold">
+                ${{ profile.collab_price_min }} — ${{ profile.collab_price_max }}
+            </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="mt-6 pt-6 border-t border-gray-100">
+            <h2 class="font-bold text-gray-900 mb-3">Social Media</h2>
+            <div class="flex flex-wrap gap-3">
+                {% if profile.instagram_url %}<a href="{{ profile.instagram_url }}" target="_blank"
+                    class="px-4 py-2 bg-pink-100 text-pink-700 rounded-xl text-sm font-medium hover:bg-pink-200 transition-colors">📸
+                    Instagram</a>{% endif %}
+                {% if profile.youtube_url %}<a href="{{ profile.youtube_url }}" target="_blank"
+                    class="px-4 py-2 bg-red-100 text-red-700 rounded-xl text-sm font-medium hover:bg-red-200 transition-colors">▶️
+                    YouTube</a>{% endif %}
+                {% if profile.tiktok_url %}<a href="{{ profile.tiktok_url }}" target="_blank"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors">🎵
+                    TikTok</a>{% endif %}
+                {% if profile.twitter_url %}<a href="{{ profile.twitter_url }}" target="_blank"
+                    class="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl text-sm font-medium hover:bg-blue-200 transition-colors">🐦
+                    Twitter</a>{% endif %}
+                {% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" target="_blank"
+                    class="px-4 py-2 bg-blue-100 text-blue-800 rounded-xl text-sm font-medium hover:bg-blue-200 transition-colors">💼
+                    LinkedIn</a>{% endif %}
+            </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="mt-6 pt-6 border-t border-gray-100">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-bold text-gray-900">Reviews ({{ profile.total_reviews }})</h2>
+                {% if user.is_authenticated and user.is_brand_user %}
+                <a href="/reviews/influencer/{{ profile.pk }}/"
+                    class="text-sm text-violet-600 font-medium hover:underline">+ Leave Review</a>
+                {% endif %}
+            </div>
+            {% for review in reviews %}
+            <div class="mb-4 p-4 bg-gray-50 rounded-xl">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="font-medium text-gray-800 text-sm">{{
+                        review.reviewer.get_full_name|default:review.reviewer.username }}</p>
+                    <div class="flex gap-0.5">
+                        {% for i in "12345" %}
+                        <span
+                            class="text-sm {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300{% endif %}">★</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600">{{ review.feedback }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ review.created_at|date:"M d, Y" }}</p>
+            </div>
+            {% empty %}
+            <p class="text-sm text-gray-400">No reviews yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div id="csrf-data" data-csrf="{{ csrf_token }}" style="display:none;"></div>
+
+<script>
+    const bookmarkBtn = document.getElementById('bookmark-btn');
+    const csrfToken = document.getElementById('csrf-data').dataset.csrf;
+
+    bookmarkBtn.addEventListener('click', function () {
+        const influencerId = this.dataset.influencerId;
+
+        fetch(`/brands/bookmark/${influencerId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(r => r.json())
+            .then(data => {
+                bookmarkBtn.textContent = data.bookmarked ? '🔖' : '🤍';
+                bookmarkBtn.dataset.bookmarked = data.bookmarked ? 'true' : 'false';
+            })
+            .catch(err => console.error('Bookmark error:', err));
+    });
+</script>
+{% endblock %}

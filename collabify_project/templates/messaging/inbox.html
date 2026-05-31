@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Messages — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Messages</h1>
+      <p class="text-gray-600 mt-1">Your conversations with brands and creators</p>
+    </div>
+    <a href="/messaging/new/" class="btn-primary">
+      ✏️ New Message
+    </a>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    {% for item in room_data %}
+    <a href="/messaging/{{ item.room.pk }}/"
+      class="flex items-center gap-4 p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors last:border-0">
+
+      <!-- Avatar -->
+      {% if item.other.avatar %}
+      <img src="{{ item.other.avatar.url }}"
+        class="w-12 h-12 rounded-full object-cover flex-shrink-0 ring-2 ring-gray-100" alt="">
+      {% else %}
+      <div class="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+        <span class="text-white font-bold text-lg">
+          {{ item.other.first_name|first|upper }}
+        </span>
+      </div>
+      {% endif %}
+
+      <!-- Content -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between mb-0.5">
+          <p class="font-semibold text-gray-900 text-sm">
+            {{ item.other.get_full_name|default:item.other.username }}
+          </p>
+          {% if item.last_msg %}
+          <p class="text-xs text-gray-400 flex-shrink-0 ml-2">
+            {{ item.last_msg.created_at|time:"H:i" }}
+          </p>
+          {% endif %}
+        </div>
+        {% if item.last_msg %}
+        <p class="text-sm text-gray-500 truncate">{{ item.last_msg.content }}</p>
+        {% else %}
+        <p class="text-sm text-gray-400 italic">No messages yet — say hello!</p>
+        {% endif %}
+        <p class="text-xs text-gray-400 mt-0.5 capitalize">
+          {{ item.other.role }}
+          {% if item.unread > 0 %}
+          • <span class="text-violet-600 font-medium">{{ item.unread }} unread</span>
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- Unread badge -->
+      {% if item.unread > 0 %}
+      <span class="w-6 h-6 bg-violet-600 text-white text-xs rounded-full flex items-center justify-center flex-shrink-0 font-bold">
+        {{ item.unread }}
+      </span>
+      {% endif %}
+
+    </a>
+    {% empty %}
+    <div class="text-center py-20 text-gray-400">
+      <p class="text-6xl mb-4">💬</p>
+      <p class="text-lg font-medium text-gray-600">No conversations yet</p>
+      <p class="text-sm mt-2 mb-6">
+        {% if user.role == 'brand' %}
+          Find a creator and send them a message
+        {% else %}
+          Apply to campaigns and message brands
+        {% endif %}
+      </p>
+      <a href="/messaging/new/" class="btn-primary inline-block">Start a Conversation</a>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

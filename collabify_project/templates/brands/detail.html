@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile.company_name }} — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+
+  <!-- Back -->
+  <a href="javascript:history.back()" class="inline-flex items-center gap-2 text-gray-500 hover:text-violet-600 text-sm font-medium mb-6 transition-colors">
+    ← Back
+  </a>
+
+  <!-- Cover -->
+  <div class="h-48 bg-gradient-to-br from-pink-500 to-rose-600 rounded-3xl relative overflow-hidden mb-0">
+    {% if profile.cover_image %}
+    <img src="{{ profile.cover_image.url }}" class="w-full h-full object-cover" alt="">
+    {% endif %}
+    {% if profile.is_verified %}
+    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow">
+      <span class="text-blue-500 text-sm">✓</span>
+      <span class="text-xs font-semibold text-gray-700">Verified Brand</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Main card -->
+  <div class="bg-white rounded-3xl shadow-sm border border-gray-100 -mt-6 relative z-10 px-8 pb-8">
+
+    <!-- Logo + Info -->
+    <div class="flex flex-col md:flex-row items-start gap-6 pt-0">
+      <div class="-mt-10 flex-shrink-0">
+        {% if profile.logo %}
+        <img src="{{ profile.logo.url }}"
+          class="w-24 h-24 rounded-2xl object-cover ring-4 ring-white shadow-lg" alt="">
+        {% else %}
+        <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl ring-4 ring-white shadow-lg flex items-center justify-center">
+          <span class="text-white text-3xl font-bold">
+            {{ profile.company_name|first|upper }}
+          </span>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="flex-1 pt-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">{{ profile.company_name }}</h1>
+            <p class="text-pink-600 font-medium capitalize mt-0.5">{{ profile.industry }}</p>
+            {% if profile.website %}
+            <a href="{{ profile.website }}" target="_blank"
+              class="text-sm text-blue-500 hover:underline mt-1 inline-block">
+              🌐 {{ profile.website }}
+            </a>
+            {% endif %}
+            {% if profile.company_size %}
+            <p class="text-sm text-gray-500 mt-1">👥 {{ profile.company_size }} employees</p>
+            {% endif %}
+          </div>
+
+          <!-- Actions -->
+          {% if user.is_authenticated and user.is_influencer_user %}
+          <div class="flex gap-3">
+            <a href="/messaging/start/{{ profile.user.pk }}/"
+              class="btn-primary text-sm">
+              💬 Message
+            </a>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+          <div class="bg-pink-50 rounded-xl p-3 text-center">
+            <p class="text-xl font-bold text-pink-700">{{ profile.total_campaigns }}</p>
+            <p class="text-xs text-gray-500 mt-0.5">Campaigns</p>
+          </div>
+          <div class="bg-yellow-50 rounded-xl p-3 text-center">
+            <p class="text-xl font-bold text-yellow-600">
+              {% if profile.avg_rating %}{{ profile.avg_rating }}★{% else %}—{% endif %}
+            </p>
+            <p class="text-xs text-gray-500 mt-0.5">Avg Rating</p>
+          </div>
+          <div class="bg-violet-50 rounded-xl p-3 text-center">
+            <p class="text-xl font-bold text-violet-700">{{ profile.reviews.count }}</p>
+            <p class="text-xs text-gray-500 mt-0.5">Reviews</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About -->
+    {% if profile.user.bio %}
+    <div class="mt-6 pt-6 border-t border-gray-100">
+      <h2 class="font-bold text-gray-900 text-lg mb-2">About</h2>
+      <p class="text-gray-600 leading-relaxed">{{ profile.user.bio }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Social links -->
+    {% if profile.instagram_url or profile.linkedin_url or profile.twitter_url %}
+    <div class="mt-6 pt-6 border-t border-gray-100">
+      <h2 class="font-bold text-gray-900 text-lg mb-3">Social Media</h2>
+      <div class="flex flex-wrap gap-3">
+        {% if profile.instagram_url %}
+        <a href="{{ profile.instagram_url }}" target="_blank"
+          class="px-4 py-2 bg-pink-100 text-pink-700 rounded-xl text-sm font-medium hover:bg-pink-200 transition-colors">
+          📸 Instagram
+        </a>
+        {% endif %}
+        {% if profile.linkedin_url %}
+        <a href="{{ profile.linkedin_url }}" target="_blank"
+          class="px-4 py-2 bg-blue-100 text-blue-800 rounded-xl text-sm font-medium hover:bg-blue-200 transition-colors">
+          💼 LinkedIn
+        </a>
+        {% endif %}
+        {% if profile.twitter_url %}
+        <a href="{{ profile.twitter_url }}" target="_blank"
+          class="px-4 py-2 bg-sky-100 text-sky-700 rounded-xl text-sm font-medium hover:bg-sky-200 transition-colors">
+          🐦 Twitter
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Active Campaigns -->
+    <div class="mt-6 pt-6 border-t border-gray-100">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-bold text-gray-900 text-lg">
+          Campaigns ({{ campaigns.count }})
+        </h2>
+        {% if user.is_authenticated and user.is_brand and user == profile.user %}
+        <a href="/campaigns/create/" class="btn-primary text-xs py-2 px-4">
+          + New Campaign
+        </a>
+        {% endif %}
+      </div>
+
+      {% for campaign in campaigns %}
+      <a href="/campaigns/{{ campaign.pk }}/"
+        class="flex items-center justify-between p-4 bg-gray-50 rounded-xl mb-3 hover:bg-violet-50 transition-colors group">
+        <div>
+          <p class="font-semibold text-gray-900 group-hover:text-violet-700 transition-colors">
+            {{ campaign.title }}
+          </p>
+          <p class="text-sm text-gray-500 mt-0.5">
+            ${{ campaign.budget }} • Deadline: {{ campaign.deadline }}
+            • {{ campaign.applications.count }} applications
+          </p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-4
+          {% if campaign.status == 'open' %}bg-green-100 text-green-700
+          {% elif campaign.status == 'ongoing' %}bg-blue-100 text-blue-700
+          {% elif campaign.status == 'completed' %}bg-gray-100 text-gray-600
+          {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+          {{ campaign.status|title }}
+        </span>
+      </a>
+      {% empty %}
+      <div class="text-center py-8 text-gray-400">
+        <p class="text-4xl mb-2">📣</p>
+        <p class="text-sm">No campaigns posted yet</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Reviews -->
+    <div class="mt-6 pt-6 border-t border-gray-100">
+      <h2 class="font-bold text-gray-900 text-lg mb-4">
+        Reviews ({{ profile.reviews.count }})
+      </h2>
+      {% for review in profile.reviews.all %}
+      <div class="mb-4 p-4 bg-gray-50 rounded-xl">
+        <div class="flex items-center justify-between mb-2">
+          <p class="font-medium text-gray-800 text-sm">
+            {{ review.reviewer.get_full_name|default:review.reviewer.username }}
+          </p>
+          <div class="flex gap-0.5">
+            {% for i in "12345" %}
+            <span class="text-sm
+              {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300{% endif %}">
+              ★
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+        <p class="text-sm text-gray-600">{{ review.feedback }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ review.created_at|date:"M d, Y" }}</p>
+      </div>
+      {% empty %}
+      <p class="text-sm text-gray-400">No reviews yet.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Report -->
+    {% if user.is_authenticated and user != profile.user %}
+    <div class="mt-6 pt-4 border-t border-gray-100 text-right">
+      <a href="/reports/user/{{ profile.user.pk }}/"
+        class="text-xs text-gray-400 hover:text-red-500 transition-colors">
+        🚩 Report this brand
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

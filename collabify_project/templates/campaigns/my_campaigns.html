@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}My Applications — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">My Applications</h1>
+      <p class="text-gray-600 mt-1">Track all your campaign applications</p>
+    </div>
+    <a href="/campaigns/" class="btn-primary">Browse More Campaigns</a>
+  </div>
+
+  <div class="space-y-4">
+    {% for app in applications %}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-start gap-4">
+          <!-- Brand logo -->
+          {% if app.campaign.brand.logo %}
+          <img src="{{ app.campaign.brand.logo.url }}"
+            class="w-12 h-12 rounded-xl object-cover flex-shrink-0" alt="">
+          {% else %}
+          <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <span class="text-white font-bold">
+              {{ app.campaign.brand.company_name|first|upper }}
+            </span>
+          </div>
+          {% endif %}
+          <div>
+            <a href="/campaigns/{{ app.campaign.pk }}/"
+              class="font-bold text-gray-900 text-lg hover:text-violet-600 transition-colors">
+              {{ app.campaign.title }}
+            </a>
+            <p class="text-sm text-violet-600 font-medium mt-0.5">
+              {{ app.campaign.brand.company_name }}
+            </p>
+            <div class="flex items-center gap-4 mt-1 text-xs text-gray-500">
+              <span>💰 ${{ app.campaign.budget }}</span>
+              <span>📅 {{ app.campaign.deadline }}</span>
+              {% if app.proposed_rate %}
+              <span>🎯 Your rate: ${{ app.proposed_rate }}</span>
+              {% endif %}
+            </div>
+            {% if app.message %}
+            <p class="text-sm text-gray-600 mt-2 bg-gray-50 rounded-xl px-3 py-2">
+              "{{ app.message|truncatechars:100 }}"
+            </p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="flex flex-col items-end gap-3 flex-shrink-0">
+          <span class="px-4 py-1.5 rounded-full text-sm font-semibold
+            {% if app.status == 'pending' %}bg-yellow-100 text-yellow-700
+            {% elif app.status == 'accepted' %}bg-green-100 text-green-700
+            {% elif app.status == 'rejected' %}bg-red-100 text-red-700
+            {% elif app.status == 'negotiating' %}bg-blue-100 text-blue-700
+            {% else %}bg-gray-100 text-gray-600{% endif %}">
+            {% if app.status == 'pending' %}⏳ Pending
+            {% elif app.status == 'accepted' %}✅ Accepted
+            {% elif app.status == 'rejected' %}❌ Rejected
+            {% elif app.status == 'negotiating' %}🔄 Negotiating
+            {% else %}{{ app.status|title }}{% endif %}
+          </span>
+          <p class="text-xs text-gray-400">Applied {{ app.created_at|date:"M d, Y" }}</p>
+          {% if app.status == 'accepted' %}
+          <a href="/messaging/start/{{ app.campaign.brand.user.pk }}/"
+            class="btn-primary text-xs py-2 px-4">
+            💬 Message Brand
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-20 text-gray-400">
+      <p class="text-6xl mb-4">📋</p>
+      <p class="text-lg font-medium text-gray-600">No applications yet</p>
+      <p class="text-sm mt-2 mb-6">Find campaigns that match your niche and start applying</p>
+      <a href="/campaigns/" class="btn-primary inline-block">Browse Campaigns</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

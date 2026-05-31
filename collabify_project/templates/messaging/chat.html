@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+{% block title %}Chat with {{ other.get_full_name|default:other.username }} — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6">
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col" style="height: calc(100vh - 140px); min-height: 500px;">
+
+    <!-- Chat Header -->
+    <div class="flex items-center gap-4 p-4 border-b border-gray-100 bg-white flex-shrink-0">
+      <a href="/messaging/" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </a>
+      {% if other.avatar %}
+      <img src="{{ other.avatar.url }}"
+        class="w-10 h-10 rounded-full object-cover ring-2 ring-violet-200" alt="">
+      {% else %}
+      <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
+        <span class="text-white font-bold">{{ other.first_name|first|upper }}</span>
+      </div>
+      {% endif %}
+      <div class="flex-1">
+        <h2 class="font-bold text-gray-900">
+          {{ other.get_full_name|default:other.username }}
+        </h2>
+        <p class="text-xs text-green-500 font-medium" id="connection-status">
+          Connecting...
+        </p>
+      </div>
+      <a href="{% if other.is_influencer %}/influencers/{% if other.influencer_profile %}{{ other.influencer_profile.pk }}/{% endif %}{% else %}/brands/{% if other.brand_profile %}{{ other.brand_profile.pk }}/{% endif %}{% endif %}"
+        class="text-xs text-violet-600 font-medium hover:underline px-3 py-1.5 bg-violet-50 rounded-lg">
+        View Profile
+      </a>
+    </div>
+
+    <!-- Messages Area -->
+    <div id="messages"
+      class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+      {% for msg in messages %}
+      <div class="flex {% if msg.sender == user %}justify-end{% else %}justify-start{% endif %} items-end gap-2">
+        {% if msg.sender != user %}
+        {% if msg.sender.avatar %}
+        <img src="{{ msg.sender.avatar.url }}" class="w-7 h-7 rounded-full object-cover flex-shrink-0 mb-1" alt="">
+        {% else %}
+        <div class="w-7 h-7 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mb-1">
+          <span class="text-white text-xs font-bold">{{ msg.sender.first_name|first|upper }}</span>
+        </div>
+        {% endif %}
+        {% endif %}
+        <div class="max-w-xs lg:max-w-md">
+          <div class="px-4 py-2.5 rounded-2xl text-sm
+            {% if msg.sender == user %}
+              bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-br-sm
+            {% else %}
+              bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm
+            {% endif %}">
+            <p class="leading-relaxed">{{ msg.content }}</p>
+          </div>
+          <p class="text-xs mt-1 {% if msg.sender == user %}text-right text-gray-400{% else %}text-gray-400{% endif %}">
+            {{ msg.created_at|time:"H:i" }}
+            {% if msg.sender == user %}
+            {% if msg.is_read %}· Seen{% endif %}
+            {% endif %}
+          </p>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center py-12 text-gray-400" id="empty-state">
+        <p class="text-5xl mb-3">👋</p>
+        <p class="font-medium text-gray-600">Start a conversation</p>
+        <p class="text-sm mt-1">Say hello to {{ other.get_full_name|default:other.username }}!</p>
+      </div>
+      {% endfor %}
+
+      <!-- Typing indicator -->
+      <div id="typing-indicator" class="hidden flex items-end gap-2">
+        <div class="w-7 h-7 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+          <span class="text-white text-xs font-bold">{{ other.first_name|first|upper }}</span>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+          <div class="flex gap-1 items-center">
+            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0s"></div>
+            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.2s"></div>
+            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0.4s"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll anchor -->
+      <div id="scroll-bottom"></div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="p-4 border-t border-gray-100 bg-white flex-shrink-0">
+      <div class="flex gap-3 items-end">
+        <div class="flex-1 relative">
+          <textarea
+            id="message-input"
+            placeholder="Type a message..."
+            rows="1"
+            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 bg-gray-50 resize-none text-sm leading-relaxed"
+            style="max-height: 120px; overflow-y: auto;"
+          ></textarea>
+        </div>
+        <button id="send-btn"
+          class="btn-primary px-5 py-3 flex items-center gap-2 flex-shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+          </svg>
+          Send
+        </button>
+      </div>
+      <p class="text-xs text-gray-400 mt-2 pl-1">Press Enter to send • Shift+Enter for new line</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Hidden data -->
+<div id="chat-data"
+  data-room-id="{{ room.pk }}"
+  data-user-id="{{ user.pk }}"
+  data-user-name="{{ user.get_full_name|default:user.username }}"
+  data-other-name="{{ other.get_full_name|default:other.username }}"
+  data-other-username="{{ other.username }}"
+  data-csrf="{{ csrf_token }}"
+  style="display:none;">
+</div>
+<!-- Hidden data -->
+<div id="chat-data"
+  data-room-id="{{ room.pk }}"
+  data-user-id="{{ user.pk }}"
+  data-user-name="{{ user.get_full_name|default:user.username }}"
+  data-other-name="{{ other.get_full_name|default:other.username }}"
+  data-other-username="{{ other.username }}"
+  data-csrf="{{ csrf_token }}"
+  style="display:none;">
+</div>
+
+<script>
+  const chatData      = document.getElementById('chat-data');
+  const roomId        = parseInt(chatData.dataset.roomId);
+  const currentUserId = parseInt(chatData.dataset.userId);
+  const otherName     = chatData.dataset.otherName;
+  const csrfToken     = chatData.dataset.csrf;
+
+  const messagesDiv   = document.getElementById('messages');
+  const input         = document.getElementById('message-input');
+  const sendBtn       = document.getElementById('send-btn');
+  const typingEl      = document.getElementById('typing-indicator');
+  const statusEl      = document.getElementById('connection-status');
+  const emptyState    = document.getElementById('empty-state');
+
+  let socketReady = false;
+  let typingTimer;
+
+  // ── WebSocket setup ──────────────────────────────────────
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  let socket;
+
+  function connectSocket() {
+    try {
+      socket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${roomId}/`);
+
+      socket.onopen = function() {
+        socketReady = true;
+        statusEl.textContent = 'Online';
+        statusEl.className   = 'text-xs text-green-500 font-medium';
+      };
+
+      socket.onclose = function() {
+        socketReady = false;
+        statusEl.textContent = 'Using standard mode';
+        statusEl.className   = 'text-xs text-gray-400 font-medium';
+      };
+
+      socket.onerror = function() {
+        socketReady = false;
+        statusEl.textContent = 'Using standard mode';
+        statusEl.className   = 'text-xs text-gray-400 font-medium';
+      };
+
+      socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if (data.type === 'message') {
+          // Only append if message is from the other person
+          // (our own messages are appended immediately on send)
+          if (data.sender_id !== currentUserId) {
+            appendMessage(data);
+          }
+        } else if (data.type === 'typing') {
+          if (data.user !== chatData.dataset.userName) {
+            typingEl.classList.toggle('hidden', !data.is_typing);
+            scrollToBottom();
+          }
+        }
+      };
+    } catch(e) {
+      socketReady = false;
+      statusEl.textContent = 'Using standard mode';
+      statusEl.className   = 'text-xs text-gray-400 font-medium';
+    }
+  }
+
+  connectSocket();
+
+  // ── Send message ─────────────────────────────────────────
+  function sendMessage() {
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    // Disable send button briefly
+    sendBtn.disabled = true;
+    sendBtn.classList.add('opacity-60');
+
+    if (socketReady && socket.readyState === WebSocket.OPEN) {
+      // Send via WebSocket
+      socket.send(JSON.stringify({ type: 'message', message: msg }));
+      // Append own message immediately
+      appendMessage({
+        message: msg,
+        sender_id: currentUserId,
+        sender_name: chatData.dataset.userName,
+        timestamp: new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}),
+      });
+      input.value = '';
+      input.style.height = 'auto';
+      sendBtn.disabled = false;
+      sendBtn.classList.remove('opacity-60');
+    } else {
+      // HTTP fallback
+      fetch(`/messaging/${roomId}/send/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `message=${encodeURIComponent(msg)}`
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'ok') {
+          appendMessage({
+            message: data.content,
+            sender_id: data.sender_id,
+            sender_name: data.sender_name,
+            timestamp: data.timestamp,
+          });
+          input.value = '';
+          input.style.height = 'auto';
+        }
+      })
+      .catch(err => {
+        console.error('Send error:', err);
+        statusEl.textContent = 'Failed to send';
+        statusEl.className   = 'text-xs text-red-400 font-medium';
+      })
+      .finally(() => {
+        sendBtn.disabled = false;
+        sendBtn.classList.remove('opacity-60');
+      });
+    }
+  }
+
+  // ── Append message to UI ──────────────────────────────────
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+  }
+
+  function appendMessage(data) {
+    const isOwn = data.sender_id === currentUserId;
+
+    if (emptyState) emptyState.remove();
+
+    const wrapper = document.createElement('div');
+    wrapper.className = `flex ${isOwn ? 'justify-end' : 'justify-start'} items-end gap-2`;
+
+    const avatarHtml = isOwn ? '' : `
+      <div class="w-7 h-7 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mb-1">
+        <span class="text-white text-xs font-bold">
+          ${escapeHtml(otherName.charAt(0).toUpperCase())}
+        </span>
+      </div>`;
+
+    wrapper.innerHTML = `
+      ${avatarHtml}
+      <div class="max-w-xs lg:max-w-md">
+        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed
+          ${isOwn
+            ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-br-sm'
+            : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm'}">
+          ${escapeHtml(data.message)}
+        </div>
+        <p class="text-xs mt-1 text-gray-400 ${isOwn ? 'text-right' : ''}">
+          ${data.timestamp}
+        </p>
+      </div>`;
+
+    messagesDiv.insertBefore(wrapper, typingEl);
+    scrollToBottom();
+  }
+
+  function scrollToBottom() {
+    const anchor = document.getElementById('scroll-bottom');
+    if (anchor) anchor.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ── Event listeners ───────────────────────────────────────
+  sendBtn.addEventListener('click', sendMessage);
+
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Auto-resize textarea
+  input.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+
+    // Typing indicator via WebSocket
+    if (socketReady && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: 'typing', is_typing: true }));
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(function() {
+        if (socketReady && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ type: 'typing', is_typing: false }));
+        }
+      }, 1500);
+    }
+  });
+
+  // Poll for new messages every 3 seconds (when WebSocket is down)
+  setInterval(function() {
+    if (!socketReady) {
+      fetch(`/messaging/${roomId}/`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+    }
+  }, 3000);
+
+  scrollToBottom();
+</script>
+{% endblock %}

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Collabify — Connect. Collaborate. Grow.{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            violet: {
+              50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe',
+              300: '#c4b5fd', 400: '#a78bfa', 500: '#8b5cf6',
+              600: '#7c3aed', 700: '#6d28d9', 800: '#5b21b6', 900: '#4c1d95'
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .glass-dark {
+      background: rgba(15, 15, 15, 0.7);
+      backdrop-filter: blur(12px);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #7c3aed;
+      border: 2px solid #7c3aed;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: #f5f3ff;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #a78bfa;
+      border-radius: 3px;
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-gray-50 text-gray-900 antialiased">
+
+  {% if user.is_authenticated %}
+  <!-- Dashboard Navbar -->
+  <nav class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="/" class="flex items-center gap-2">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center">
+            <span class="text-white font-bold text-sm">C</span>
+          </div>
+          <span class="font-bold text-lg gradient-text">Collabify</span>
+        </a>
+        <div class="hidden md:flex items-center gap-6">
+          <a href="/dashboard/"
+            class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Dashboard</a>
+          <a href="/campaigns/"
+            class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Campaigns</a>
+          <a href="/influencers/"
+            class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Creators</a>
+          <a href="/messaging/"
+            class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Messages</a>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="/notifications/" class="relative p-2 rounded-xl hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            {% if unread_count %}<span
+              class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">{{ unread_count }}</span>{% endif %}
+          </a>
+          <div class="relative group">
+            <button class="flex items-center gap-2 p-1 rounded-xl hover:bg-gray-100 transition-colors">
+              {% if user.avatar %}
+              <img src="{{ user.avatar.url }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-violet-200" alt="">
+              {% else %}
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm font-semibold">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+              </div>
+              {% endif %}
+              <span class="text-sm font-medium text-gray-700 hidden md:block">{{ user.get_full_name }}</span>
+            </button>
+            <div
+              class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="p-2">
+                <div class="px-3 py-2 border-b border-gray-100 mb-1">
+                  <p class="text-xs text-gray-500">Signed in as</p>
+                  <p class="text-sm font-semibold text-gray-800">{{ user.username }}</p>
+                  <span class="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full capitalize">{{ user.role }}</span>
+                </div>
+
+                {% if user.role == 'influencer' %}
+                <a href="/influencers/edit/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  👤 My Profile
+                </a>
+                <a href="/influencers/edit/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  ✏️ Edit Profile
+                </a>
+                <a href="/campaigns/my/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  📋 My Applications
+                </a>
+
+                {% elif user.role == 'brand' %}
+                <a href="/brands/edit/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  🏢 Company Profile
+                </a>
+                <a href="/brands/edit/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  ✏️ Edit Profile
+                </a>
+                <a href="/campaigns/my/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  📣 My Campaigns
+                </a>
+                {% endif %}
+
+                <a href="/messaging/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  💬 Messages
+                </a>
+                <a href="/notifications/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  🔔 Notifications
+                </a>
+                <a href="/dashboard/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  📊 Dashboard
+                </a>
+
+                <div class="border-t border-gray-100 my-1"></div>
+                <a href="/accounts/logout/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-red-50 text-sm text-red-600">
+                  🚪 Sign out
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  {% endif %}
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="fixed top-20 right-4 z-50 space-y-2" id="toast-container">
+    {% for message in messages %}
+    <div
+      class="toast flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium max-w-sm
+  {% if message.tags == 'error' %}bg-red-500 text-white{% elif message.tags == 'success' %}bg-green-500 text-white{% else %}bg-violet-600 text-white{% endif %}">
+      {{ message }}
+      <button onclick="this.parentElement.remove()" class="ml-auto opacity-70 hover:opacity-100">✕</button>
+    </div>
+    {% endfor %}
+  </div>
+  <script>setTimeout(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); }, 4000);</script>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+  <footer class="bg-gray-900 text-gray-400 py-12 mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="col-span-2 md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <span class="text-white font-bold text-sm">C</span>
+            </div>
+            <span class="text-white font-bold text-lg">Collabify</span>
+          </div>
+          <p class="text-sm leading-relaxed">Connect. Collaborate. Grow. The platform where brands meet creators.</p>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-3 text-sm">Platform</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/campaigns/" class="hover:text-white transition-colors">Campaigns</a></li>
+            <li><a href="/influencers/" class="hover:text-white transition-colors">Creators</a></li>
+            <li><a href="/dashboard/" class="hover:text-white transition-colors">Dashboard</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-3 text-sm">Company</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/about/" class="hover:text-white transition-colors">About</a></li>
+            <li><a href="/contact/" class="hover:text-white transition-colors">Contact</a></li>
+            <li><a href="/faqs/" class="hover:text-white transition-colors">FAQs</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-3 text-sm">Legal</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/privacy/" class="hover:text-white transition-colors">Privacy Policy</a></li>
+            <li><a href="/terms/" class="hover:text-white transition-colors">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+        <p>© 2026 Collabify. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

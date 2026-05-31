@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}FAQs — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-16">
+
+    <div class="text-center mb-12">
+        <h1 class="text-5xl font-extrabold text-gray-900 mb-4">Frequently Asked <span
+                class="gradient-text">Questions</span></h1>
+        <p class="text-xl text-gray-600">Everything you need to know about Collabify.</p>
+    </div>
+
+    <div class="space-y-4" id="faq-list">
+
+        {% for faq in faqs %}
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <button data-id="{{ forloop.counter }}" onclick="toggleFaq(this.dataset.id)"
+                class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors">
+
+                <span class="font-semibold text-gray-900">{{ faq.question }}</span>
+
+                <span id="icon-{{ forloop.counter }}"
+                    class="text-violet-600 text-xl flex-shrink-0 ml-4 transition-transform">
+                    +
+                </span>
+            </button>
+            <div id="answer-{{ forloop.counter }}" class="hidden px-5 pb-5">
+                <p class="text-gray-600 leading-relaxed">{{ faq.answer }}</p>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- Still have questions -->
+    <div
+        class="mt-12 bg-gradient-to-br from-violet-50 to-purple-50 rounded-3xl border border-violet-100 p-8 text-center">
+        <p class="text-2xl mb-2">🤔</p>
+        <h3 class="font-bold text-gray-900 text-xl mb-2">Still have questions?</h3>
+        <p class="text-gray-600 mb-4">Our support team is happy to help.</p>
+        <a href="/contact/" class="btn-primary inline-block">Contact Support</a>
+    </div>
+
+</div>
+
+<script>
+    function toggleFaq(id) {
+        const answer = document.getElementById('answer-' + id);
+        const icon = document.getElementById('icon-' + id);
+        const isOpen = !answer.classList.contains('hidden');
+        answer.classList.toggle('hidden', isOpen);
+        icon.textContent = isOpen ? '+' : '−';
+    }
+</script>
+{% endblock %}

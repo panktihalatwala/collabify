@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Creators — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Discover Creators</h1>
+    <p class="text-gray-600 mt-1">Find the perfect influencer for your brand</p>
+  </div>
+
+  <!-- Search & Filters -->
+  <form method="get" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-8">
+    <div class="flex flex-col md:flex-row gap-3">
+      <input type="text" name="search" value="{{ search }}" placeholder="Search creators..."
+        class="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500">
+      <select name="niche" class="px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500">
+        <option value="">All Niches</option>
+        {% for value, label in niche_choices %}
+        <option value="{{ value }}" {% if value == selected_niche %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <select name="sort" class="px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500">
+        <option value="-followers_count" {% if sort == '-followers_count' %}selected{% endif %}>Most Followers</option>
+        <option value="-avg_rating" {% if sort == '-avg_rating' %}selected{% endif %}>Best Rated</option>
+        <option value="-engagement_rate" {% if sort == '-engagement_rate' %}selected{% endif %}>Highest Engagement</option>
+        <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>Newest</option>
+      </select>
+      <button type="submit" class="btn-primary px-6">Filter</button>
+    </div>
+  </form>
+
+  <!-- Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for profile in profiles %}
+    <a href="/influencers/{{ profile.pk }}/" class="card-hover bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+      <div class="h-20 bg-gradient-to-br from-violet-400 to-purple-600"></div>
+      <div class="px-4 pb-5">
+        <div class="-mt-8 mb-3">
+          {% if profile.user.avatar %}
+          <img src="{{ profile.user.avatar.url }}" class="w-14 h-14 rounded-xl object-cover ring-4 ring-white shadow" alt="">
+          {% else %}
+          <div class="w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl ring-4 ring-white shadow flex items-center justify-center">
+            <span class="text-white text-lg font-bold">{{ profile.user.first_name|first|upper }}</span>
+          </div>
+          {% endif %}
+        </div>
+        <h3 class="font-bold text-gray-900">{{ profile.user.get_full_name|default:profile.user.username }}</h3>
+        <p class="text-xs text-violet-600 font-medium capitalize mb-2">{{ profile.niche }}</p>
+        <div class="space-y-1 text-xs text-gray-500">
+          <p>👥 {{ profile.followers_count|floatformat:0 }} followers</p>
+          <p>📈 {{ profile.engagement_rate }}% engagement</p>
+        </div>
+        <div class="flex items-center gap-1 mt-2">
+          <span class="text-yellow-400">★</span>
+          <span class="text-sm font-medium text-gray-700">{{ profile.avg_rating }}</span>
+          <span class="text-xs text-gray-400">({{ profile.total_reviews }})</span>
+        </div>
+        {% if profile.collab_price_min %}
+        <p class="text-xs text-gray-500 mt-2">${{ profile.collab_price_min }} — ${{ profile.collab_price_max }}</p>
+        {% endif %}
+      </div>
+    </a>
+    {% empty %}
+    <div class="col-span-4 text-center py-16 text-gray-400">
+      <p class="text-6xl mb-4">🔍</p>
+      <p class="text-lg font-medium">No creators found</p>
+      <p class="text-sm mt-2">Try different filters</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

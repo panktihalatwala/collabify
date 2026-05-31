@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Create Creator Profile — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+  <div class="mb-8 text-center">
+    <h1 class="text-3xl font-bold text-gray-900">Set Up Your Creator Profile</h1>
+    <p class="text-gray-600 mt-2">Complete your profile to start getting discovered by brands</p>
+  </div>
+  <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="space-y-5">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Niche *</label>
+            {{ form.niche }}
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Followers Count</label>
+            {{ form.followers_count }}
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Engagement Rate (%)</label>
+            {{ form.engagement_rate }}
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+            {{ form.languages }}
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Min Collab Price ($)</label>
+            {{ form.collab_price_min }}
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Max Collab Price ($)</label>
+            {{ form.collab_price_max }}
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+          {{ form.cover_image }}
+        </div>
+        <p class="text-sm font-semibold text-gray-700 pt-2">Social Media Links</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Instagram</label>
+            {{ form.instagram_url }}
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">YouTube</label>
+            {{ form.youtube_url }}
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">TikTok</label>
+            {{ form.tiktok_url }}
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Twitter / X</label>
+            {{ form.twitter_url }}
+          </div>
+        </div>
+        <button type="submit" class="btn-primary w-full py-3 text-base">Create My Profile ✨</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

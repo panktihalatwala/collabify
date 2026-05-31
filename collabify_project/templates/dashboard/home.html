@@ -1,0 +1,478 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Collabify{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Welcome -->
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        Good day, {{ user.first_name|default:user.username }} 👋
+      </h1>
+      <p class="text-gray-600 mt-1">Here's what's happening with your account today.</p>
+    </div>
+    <div class="text-sm text-gray-500 bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm">
+      {% now "l, N j, Y" %}
+    </div>
+  </div>
+
+  {% if user.role == 'influencer' %}
+  <!-- ===== INFLUENCER DASHBOARD ===== -->
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+    <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-5 text-white">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-sm opacity-80 font-medium">Total Earnings</p>
+        <span class="text-2xl">💰</span>
+      </div>
+      <p class="text-3xl font-bold">${{ profile.total_earnings|floatformat:0 }}</p>
+      <p class="text-xs opacity-70 mt-1">Lifetime earnings</p>
+    </div>
+    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-sm text-gray-500 font-medium">Applications</p>
+        <span class="text-2xl">📋</span>
+      </div>
+      <p class="text-3xl font-bold text-gray-900">{{ total_applications }}</p>
+      <p class="text-xs text-violet-600 mt-1">Total submitted</p>
+    </div>
+    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-sm text-gray-500 font-medium">Pending Requests</p>
+        <span class="text-2xl">⏳</span>
+      </div>
+      <p class="text-3xl font-bold text-gray-900">{{ pending_requests }}</p>
+      <p class="text-xs text-yellow-600 mt-1">Awaiting response</p>
+    </div>
+    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-sm text-gray-500 font-medium">Active Collabs</p>
+        <span class="text-2xl">🤝</span>
+      </div>
+      <p class="text-3xl font-bold text-gray-900">{{ active_collabs }}</p>
+      <p class="text-xs text-green-600 mt-1">Currently running</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+    <!-- Earnings Chart -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <h2 class="font-bold text-gray-900 text-lg mb-4">Earnings Overview</h2>
+      <canvas id="earningsChart" height="200"></canvas>
+    </div>
+
+    <!-- Profile stats -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <h2 class="font-bold text-gray-900 text-lg mb-4">Profile Stats</h2>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Followers</span>
+          <span class="font-bold text-gray-900">{{ profile.followers_count|floatformat:0 }}</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-2">
+          <div class="bg-violet-500 h-2 rounded-full" style="width: 75%"></div>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Engagement Rate</span>
+          <span class="font-bold text-gray-900">{{ profile.engagement_rate }}%</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-2">
+          <div class="bg-green-500 h-2 rounded-full" id="engagement-bar" data-rate="{{ profile.engagement_rate }}"
+            style="width: 0%">
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Avg Rating</span>
+          <span class="font-bold text-yellow-500">{{ profile.avg_rating }} ★</span>
+        </div>
+        <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+          <span class="text-sm text-gray-600">Total Reviews</span>
+          <span class="font-bold text-gray-900">{{ profile.total_reviews }}</span>
+        </div>
+      </div>
+      <a href="/influencers/edit/"
+        class="mt-4 w-full block text-center py-2 bg-violet-50 text-violet-600 rounded-xl text-sm font-medium hover:bg-violet-100 transition-colors">
+        Edit Profile
+      </a>
+    </div>
+
+    <!-- Notifications -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-bold text-gray-900 text-lg">Notifications</h2>
+        <a href="/notifications/" class="text-xs text-violet-600 font-medium hover:underline">View all</a>
+      </div>
+      {% for notif in notifications %}
+      <div class="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0
+          {% if notif.notification_type == 'message' %}bg-blue-100
+          {% elif notif.notification_type == 'collab_request' %}bg-violet-100
+          {% else %}bg-gray-100{% endif %}">
+          {% if notif.notification_type == 'message' %}💬
+          {% elif notif.notification_type == 'collab_request' %}🤝
+          {% elif notif.notification_type == 'accepted' %}✅
+          {% else %}🔔{% endif %}
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-gray-800">{{ notif.title }}</p>
+          <p class="text-xs text-gray-500 mt-0.5">{{ notif.created_at|timesince }} ago</p>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center py-6 text-gray-400">
+        <p class="text-3xl mb-2">🔔</p>
+        <p class="text-xs">No new notifications</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Recent Applications -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="font-bold text-gray-900 text-lg">Recent Applications</h2>
+        <a href="/campaigns/" class="text-sm text-violet-600 font-medium hover:underline">Browse more</a>
+      </div>
+      {% for app in applications %}
+      <div class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
+        <div>
+          <p class="font-medium text-gray-800 text-sm">{{ app.campaign.title|truncatechars:40 }}</p>
+          <p class="text-xs text-gray-500 mt-0.5">{{ app.campaign.brand.company_name }} • {{ app.created_at|date:"M d"
+            }}</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-medium flex-shrink-0
+          {% if app.status == 'pending' %}bg-yellow-100 text-yellow-700
+          {% elif app.status == 'accepted' %}bg-green-100 text-green-700
+          {% elif app.status == 'rejected' %}bg-red-100 text-red-700
+          {% else %}bg-gray-100 text-gray-600{% endif %}">
+          {{ app.status|title }}
+        </span>
+      </div>
+      {% empty %}
+      <div class="text-center py-8 text-gray-400">
+        <p class="text-4xl mb-2">📋</p>
+        <p class="text-sm">No applications yet</p>
+        <a href="/campaigns/" class="text-violet-600 text-sm font-medium mt-1 inline-block">Browse campaigns →</a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Collaboration Requests -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <h2 class="font-bold text-gray-900 text-lg mb-5">Collaboration Requests</h2>
+      {% for req in collab_requests %}
+      <div class="mb-4 p-4 bg-gray-50 rounded-xl">
+        <div class="flex items-center justify-between mb-2">
+          <p class="font-semibold text-gray-800 text-sm">{{ req.brand.company_name }}</p>
+          <span class="text-sm font-bold text-violet-600">${{ req.payment_amount }}</span>
+        </div>
+        <p class="text-xs text-gray-500 mb-3">Deadline: {{ req.deadline }}</p>
+        {% if req.status == 'pending' %}
+        <form method="post" action="/campaigns/collab/{{ req.pk }}/respond/">
+          {% csrf_token %}
+          <div class="flex gap-2">
+            <button name="action" value="accept"
+              class="flex-1 py-2 bg-green-500 text-white text-xs rounded-lg font-semibold hover:bg-green-600 transition-colors">
+              Accept
+            </button>
+            <button name="action" value="reject"
+              class="flex-1 py-2 bg-red-100 text-red-600 text-xs rounded-lg font-semibold hover:bg-red-200 transition-colors">
+              Reject
+            </button>
+            <a href="/messaging/start/{{ req.brand.user.pk }}/"
+              class="flex-1 py-2 bg-violet-100 text-violet-600 text-xs rounded-lg font-semibold hover:bg-violet-200 transition-colors text-center">
+              Chat
+            </a>
+          </div>
+        </form>
+        {% else %}
+        <span class="px-3 py-1 rounded-full text-xs font-medium
+          {% if req.status == 'accepted' %}bg-green-100 text-green-700
+          {% elif req.status == 'rejected' %}bg-red-100 text-red-700
+          {% else %}bg-blue-100 text-blue-700{% endif %}">
+          {{ req.status|title }}
+        </span>
+        {% endif %}
+      </div>
+      {% empty %}
+      <div class="text-center py-8 text-gray-400">
+        <p class="text-4xl mb-2">🤝</p>
+        <p class="text-sm">No requests yet</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+    <a href="/campaigns/" class="card-hover bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-5 text-white">
+      <p class="text-2xl mb-2">📣</p>
+      <p class="font-bold">Browse Campaigns</p>
+      <p class="text-sm opacity-80 mt-1">Find your next collaboration</p>
+    </a>
+    <a href="/influencers/edit/" class="card-hover bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <p class="text-2xl mb-2">✏️</p>
+      <p class="font-bold text-gray-900">Edit Profile</p>
+      <p class="text-sm text-gray-500 mt-1">Keep your profile updated</p>
+    </a>
+    <a href="/messaging/" class="card-hover bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <p class="text-2xl mb-2">💬</p>
+      <p class="font-bold text-gray-900">Messages</p>
+      <p class="text-sm text-gray-500 mt-1">Chat with brands</p>
+    </a>
+  </div>
+
+  {% elif user.role == 'brand' %}
+  <!-- ===== BRAND DASHBOARD ===== -->
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+    <div class="bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl p-5 text-white">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-sm opacity-80 font-medium">Total Campaigns</p>
+        <span class="text-2xl">📣</span>
+      </div>
+      <p class="text-3xl font-bold">{{ total_campaigns }}</p>
+      <p class="text-xs opacity-70 mt-1">{{ open_campaigns }} currently open</p>
+    </div>
+    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-sm text-gray-500 font-medium">Applications</p>
+        <span class="text-2xl">📋</span>
+      </div>
+      <p class="text-3xl font-bold text-gray-900">{{ total_applications }}</p>
+      <p class="text-xs text-green-600 mt-1">Across all campaigns</p>
+    </div>
+    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-sm text-gray-500 font-medium">Requests Sent</p>
+        <span class="text-2xl">🤝</span>
+      </div>
+      <p class="text-3xl font-bold text-gray-900">{{ sent_requests|length }}</p>
+      <p class="text-xs text-blue-600 mt-1">To creators</p>
+    </div>
+    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-sm text-gray-500 font-medium">Open Campaigns</p>
+        <span class="text-2xl">🟢</span>
+      </div>
+      <p class="text-3xl font-bold text-gray-900">{{ open_campaigns }}</p>
+      <p class="text-xs text-violet-600 mt-1">Accepting applications</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+    <!-- Applications Chart -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <h2 class="font-bold text-gray-900 text-lg mb-4">Applications Trend</h2>
+      <canvas id="appChart" height="200"></canvas>
+    </div>
+
+    <!-- My Campaigns -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="font-bold text-gray-900 text-lg">My Campaigns</h2>
+        <a href="/campaigns/create/" class="btn-primary text-xs py-2 px-4">+ New</a>
+      </div>
+      {% for campaign in campaigns %}
+      <a href="/campaigns/{{ campaign.pk }}/"
+        class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 rounded-xl px-3 -mx-3 transition-colors">
+        <div>
+          <p class="font-medium text-gray-800 text-sm">{{ campaign.title|truncatechars:45 }}</p>
+          <p class="text-xs text-gray-500 mt-0.5">
+            ${{ campaign.budget }} • {{ campaign.deadline }} • {{ campaign.applications.count }} applications
+          </p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ml-3
+          {% if campaign.status == 'open' %}bg-green-100 text-green-700
+          {% elif campaign.status == 'ongoing' %}bg-blue-100 text-blue-700
+          {% elif campaign.status == 'completed' %}bg-gray-100 text-gray-600
+          {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+          {{ campaign.status|title }}
+        </span>
+      </a>
+      {% empty %}
+      <div class="text-center py-8 text-gray-400">
+        <p class="text-4xl mb-2">📣</p>
+        <p class="text-sm">No campaigns yet</p>
+        <a href="/campaigns/create/" class="text-violet-600 text-sm font-medium mt-1 inline-block">Create one →</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Recent Applications -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <h2 class="font-bold text-gray-900 text-lg mb-5">Recent Applications</h2>
+      {% for app in applications %}
+      <div class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
+        <div class="flex items-center gap-3">
+          {% if app.influencer.user.avatar %}
+          <img src="{{ app.influencer.user.avatar.url }}" class="w-9 h-9 rounded-full object-cover" alt="">
+          {% else %}
+          <div
+            class="w-9 h-9 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <span class="text-white text-xs font-bold">{{ app.influencer.user.first_name|first|upper }}</span>
+          </div>
+          {% endif %}
+          <div>
+            <p class="font-medium text-gray-800 text-sm">{{
+              app.influencer.user.get_full_name|default:app.influencer.user.username }}</p>
+            <p class="text-xs text-gray-500">{{ app.campaign.title|truncatechars:25 }}</p>
+          </div>
+        </div>
+        <div class="text-right">
+          {% if app.proposed_rate %}<p class="text-xs font-bold text-violet-600">${{ app.proposed_rate }}</p>{% endif %}
+          <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+            {{ app.status|title }}
+          </span>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center py-8 text-gray-400">
+        <p class="text-4xl mb-2">📋</p>
+        <p class="text-sm">No applications yet</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Notifications + Quick Actions -->
+    <div class="space-y-4">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-gray-900">Recent Notifications</h2>
+          <a href="/notifications/" class="text-xs text-violet-600 font-medium hover:underline">View all</a>
+        </div>
+        {% for notif in notifications %}
+        <div class="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0">
+          <span class="text-lg">
+            {% if notif.notification_type == 'application' %}📋
+            {% elif notif.notification_type == 'message' %}💬
+            {% else %}🔔{% endif %}
+          </span>
+          <div>
+            <p class="text-xs font-semibold text-gray-800">{{ notif.title }}</p>
+            <p class="text-xs text-gray-500">{{ notif.created_at|timesince }} ago</p>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-sm text-gray-400 text-center py-4">No new notifications</p>
+        {% endfor %}
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="grid grid-cols-3 gap-3">
+        <a href="/influencers/"
+          class="card-hover bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-4 text-white text-center">
+          <p class="text-xl mb-1">🔍</p>
+          <p class="text-xs font-semibold">Find Creators</p>
+        </a>
+        <a href="/brands/bookmarks/"
+          class="card-hover bg-white rounded-xl p-4 border border-gray-100 shadow-sm text-center">
+          <p class="text-xl mb-1">🔖</p>
+          <p class="text-xs font-semibold text-gray-700">Saved</p>
+        </a>
+        <a href="/messaging/" class="card-hover bg-white rounded-xl p-4 border border-gray-100 shadow-sm text-center">
+          <p class="text-xl mb-1">💬</p>
+          <p class="text-xs font-semibold text-gray-700">Messages</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+
+<!-- Chart.js -->
+<!-- Pass chart data safely via data attributes -->
+<div id="chart-data" data-months='{{ chart_months|safe }}' data-earnings='{{ chart_earnings|safe }}'
+  data-appdata='{% if user.role == 'brand' %}{{ chart_app_data|safe }}{% else %}[]{% endif %}' data-role="{{ user.role }}"
+  style="display:none;">
+</div>
+
+<script>
+  const chartData = document.getElementById('chart-data');
+  const role = chartData.dataset.role;
+  const months = JSON.parse(chartData.dataset.months || '[]');
+  const earnings = JSON.parse(chartData.dataset.earnings || '[]');
+  const appData = JSON.parse(chartData.dataset.appdata || '[]');
+
+  if (role === 'influencer') {
+    const earningsCtx = document.getElementById('earningsChart');
+    if (earningsCtx) {
+      new Chart(earningsCtx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Earnings ($)',
+            data: earnings,
+            borderColor: '#7c3aed',
+            backgroundColor: 'rgba(124,58,237,0.08)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#7c3aed',
+            pointRadius: 4,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+  }
+
+  if (role === 'brand') {
+    const appCtx = document.getElementById('appChart');
+    if (appCtx) {
+      new Chart(appCtx, {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Applications',
+            data: appData,
+            backgroundColor: 'rgba(236,72,153,0.7)',
+            borderRadius: 8,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+  }
+  // Set engagement bar width
+const engBar = document.getElementById('engagement-bar');
+if (engBar) {
+  const rate = parseFloat(engBar.dataset.rate) || 0;
+  // engagement rate is usually 1-10%, multiply by 10 to get visual %
+  engBar.style.width = Math.min(rate * 10, 100) + '%';
+}
+</script>
+
+
+
+{% endblock %}
