@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('cover_image', models.ImageField(blank=True, null=True, upload_to='influencer_covers/')),
                 ('instagram_url', models.URLField(blank=True)),
                 ('youtube_url', models.URLField(blank=True)),
-                ('tiktok_url', models.URLField(blank=True)),
+                
                 ('twitter_url', models.URLField(blank=True)),
                 ('linkedin_url', models.URLField(blank=True)),
                 ('website_url', models.URLField(blank=True)),

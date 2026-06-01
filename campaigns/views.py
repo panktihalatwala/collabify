@@ -7,6 +7,7 @@ from .forms import CampaignForm, ApplicationForm, CollaborationRequestForm
 from brands.models import BrandProfile
 from influencers.models import InfluencerProfile
 
+
 def campaign_list(request):
     campaigns = Campaign.objects.filter(
         status='open'
@@ -24,10 +25,11 @@ def campaign_list(request):
         'search': search
     })
 
+
 def campaign_detail(request, pk):
     campaign = get_object_or_404(Campaign, pk=pk)
     already_applied = False
-    if request.user.is_authenticated and request.user.is_influencer():
+    if request.user.is_authenticated and request.user.role == 'influencer':
         already_applied = CampaignApplication.objects.filter(
             campaign=campaign,
             influencer__user=request.user
@@ -38,9 +40,10 @@ def campaign_detail(request, pk):
         'app_form': ApplicationForm(),
     })
 
+
 @login_required
 def create_campaign(request):
-    if not request.user.is_brand():
+    if request.user.role != 'brand':
         messages.error(request, 'Only brands can create campaigns.')
         return redirect('campaigns:list')
     brand = get_object_or_404(BrandProfile, user=request.user)
@@ -58,28 +61,29 @@ def create_campaign(request):
         form = CampaignForm()
     return render(request, 'campaigns/create.html', {'form': form})
 
+
 @login_required
 def apply_campaign(request, pk):
     campaign = get_object_or_404(Campaign, pk=pk)
-    if not request.user.is_influencer():
+    if request.user.role != 'influencer':
         messages.error(request, 'Only influencers can apply.')
         return redirect('campaigns:detail', pk=pk)
     try:
         influencer = request.user.influencer_profile
-    except:
+    except Exception:
         messages.error(request, 'Please create your influencer profile first.')
         return redirect('influencers:create_profile')
     if request.method == 'POST':
         form = ApplicationForm(request.POST)
         if form.is_valid():
-            # Check not already applied
             if CampaignApplication.objects.filter(
-                campaign=campaign, influencer=influencer
+                campaign=campaign,
+                influencer=influencer
             ).exists():
                 messages.warning(request, 'You already applied to this campaign.')
                 return redirect('campaigns:detail', pk=pk)
             app = form.save(commit=False)
-            app.campaign  = campaign
+            app.campaign   = campaign
             app.influencer = influencer
             app.save()
             from notifications.models import Notification
@@ -94,19 +98,32 @@ def apply_campaign(request, pk):
             return redirect('campaigns:detail', pk=campaign.pk)
     return redirect('campaigns:detail', pk=campaign.pk)
 
+
 @login_required
 def my_campaigns(request):
-    if request.user.is_brand():
-        brand = get_object_or_404(BrandProfile, user=request.user)
-        campaigns = Campaign.objects.filter(brand=brand).order_by('-created_at')
-        return render(request, 'campaigns/my_campaigns.html', {'campaigns': campaigns})
+    print(f"DEBUG: user={request.user.username} role={request.user.role}")
+    
+    if request.user.role == 'brand':
+        print("DEBUG: going to brand campaigns")
+        try:
+            brand = BrandProfile.objects.get(user=request.user)
+        except BrandProfile.DoesNotExist:
+            messages.error(request, 'Please create your brand profile first.')
+            return redirect('brands:create_profile')
+        campaigns = Campaign.objects.filter(
+            brand=brand
+        ).order_by('-created_at')
+        print(f"DEBUG: found {campaigns.count()} campaigns")
+        return render(request, 'campaigns/my_campaigns.html', {
+            'campaigns': campaigns
+        })
     else:
-        # Influencer — show their applications
+        print("DEBUG: going to influencer applications")
         try:
             influencer = request.user.influencer_profile
-        except:
+        except Exception:
+            messages.error(request, 'Please create your influencer profile first.')
             return redirect('influencers:create_profile')
-        from .models import CampaignApplication
         applications = CampaignApplication.objects.filter(
             influencer=influencer
         ).select_related('campaign__brand').order_by('-created_at')
@@ -116,7 +133,7 @@ def my_campaigns(request):
 
 @login_required
 def send_collab_request(request, influencer_pk):
-    if not request.user.is_brand():
+    if request.user.role != 'brand':
         messages.error(request, 'Only brands can send requests.')
         return redirect('influencers:list')
     brand      = get_object_or_404(BrandProfile, user=request.user)
@@ -124,7 +141,7 @@ def send_collab_request(request, influencer_pk):
     if request.method == 'POST':
         form = CollaborationRequestForm(request.POST, brand=brand)
         if form.is_valid():
-            req = form.save(commit=False)
+            req            = form.save(commit=False)
             req.brand      = brand
             req.influencer = influencer
             req.save()
@@ -134,7 +151,7 @@ def send_collab_request(request, influencer_pk):
                 title='New Collaboration Request',
                 message=f'{brand.company_name} sent you a collaboration request!',
                 notification_type='collab_request',
-                link=f'/dashboard/'
+                link='/dashboard/'
             )
             messages.success(request, 'Collaboration request sent!')
             return redirect('influencers:detail', pk=influencer.pk)
@@ -145,10 +162,10 @@ def send_collab_request(request, influencer_pk):
         'influencer': influencer
     })
 
+
 @login_required
 def respond_collab(request, pk):
     collab = get_object_or_404(CollaborationRequest, pk=pk)
-    # Make sure it's the influencer responding
     if request.user != collab.influencer.user:
         messages.error(request, 'Not authorized.')
         return redirect('dashboard:home')
@@ -163,7 +180,7 @@ def respond_collab(request, pk):
                 title='Collaboration Accepted!',
                 message=f'{request.user.get_full_name() or request.user.username} accepted your collaboration request.',
                 notification_type='accepted',
-                link=f'/dashboard/'
+                link='/dashboard/'
             )
             messages.success(request, 'Collaboration accepted!')
         elif action == 'reject':
@@ -175,12 +192,12 @@ def respond_collab(request, pk):
                 title='Collaboration Declined',
                 message=f'{request.user.get_full_name() or request.user.username} declined your collaboration request.',
                 notification_type='rejected',
-                link=f'/dashboard/'
+                link='/dashboard/'
             )
             messages.info(request, 'Collaboration rejected.')
         elif action == 'counter':
-            collab.status         = 'negotiating'
-            collab.counter_offer  = request.POST.get('counter_offer')
+            collab.status          = 'negotiating'
+            collab.counter_offer   = request.POST.get('counter_offer')
             collab.counter_message = request.POST.get('counter_message', '')
             collab.save()
             messages.success(request, 'Counter offer sent!')

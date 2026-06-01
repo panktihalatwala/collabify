@@ -26,7 +26,7 @@
             <span>💰 Budget: ${{ app.campaign.budget }}</span>
             <span>📅 Deadline: {{ app.campaign.deadline }}</span>
             {% if app.proposed_rate %}
-            <span>🎯 Your rate: ${{ app.proposed_rate }}</span>
+            <span>🎯 Your rate: ₹{{ app.proposed_rate }}</span>
             {% endif %}
             <span>🕒 Applied: {{ app.created_at|date:"M d, Y" }}</span>
           </div>

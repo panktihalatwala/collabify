@@ -11,10 +11,10 @@ class CampaignForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Campaign title'}),
             'description': forms.Textarea(attrs={'class': TEXTAREA_CLASS, 'rows': 4}),
-            'budget': forms.NumberInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Budget in USD'}),
+            'budget': forms.NumberInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Budget in ₹'}),
             'target_audience': forms.Textarea(attrs={'class': TEXTAREA_CLASS, 'rows': 3}),
             'required_niche': forms.TextInput(attrs={'class': INPUT_CLASS, 'placeholder': 'e.g. fashion, fitness'}),
-            'platforms': forms.TextInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Instagram, TikTok'}),
+            'platforms': forms.TextInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Instagram, YouTube, Twitter'}),
             'deliverables': forms.Textarea(attrs={'class': TEXTAREA_CLASS, 'rows': 3}),
             'deadline': forms.DateInput(attrs={'class': INPUT_CLASS, 'type': 'date'}),
             'influencer_count': forms.NumberInput(attrs={'class': INPUT_CLASS}),
@@ -27,7 +27,7 @@ class ApplicationForm(forms.ModelForm):
         fields = ['message', 'proposed_rate']
         widgets = {
             'message': forms.Textarea(attrs={'class': TEXTAREA_CLASS, 'rows': 4, 'placeholder': 'Why are you a great fit?'}),
-            'proposed_rate': forms.NumberInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Your rate ($)'}),
+            'proposed_rate': forms.NumberInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Your rate (₹)'}),
         }
 
 class CollaborationRequestForm(forms.ModelForm):
@@ -44,6 +44,6 @@ class CollaborationRequestForm(forms.ModelForm):
         widgets = {
             'campaign': forms.Select(attrs={'class': INPUT_CLASS}),
             'message': forms.Textarea(attrs={'class': TEXTAREA_CLASS, 'rows': 4}),
-            'payment_amount': forms.NumberInput(attrs={'class': INPUT_CLASS}),
+            'payment_amount': forms.NumberInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Amount in ₹'}),
             'deadline': forms.DateInput(attrs={'class': INPUT_CLASS, 'type': 'date'}),
         }

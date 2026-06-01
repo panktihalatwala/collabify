@@ -1,85 +1,137 @@
 {% extends 'base.html' %}
-{% block title %}My Applications — Collabify{% endblock %}
+{% block title %}My Campaigns — Collabify{% endblock %}
 {% block content %}
 <div class="max-w-5xl mx-auto px-4 py-10">
+
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-gray-900">My Applications</h1>
-      <p class="text-gray-600 mt-1">Track all your campaign applications</p>
+      <h1 class="text-3xl font-bold text-gray-900">My Campaigns</h1>
+      <p class="text-gray-600 mt-1">Manage all your brand campaigns</p>
     </div>
-    <a href="/campaigns/" class="btn-primary">Browse More Campaigns</a>
+    <a href="/campaigns/create/" class="btn-primary">+ New Campaign</a>
   </div>
 
+  <!-- Stats row -->
+  <div class="grid grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+      <p class="text-3xl font-bold text-gray-900">{{ campaigns|length }}</p>
+      <p class="text-sm text-gray-500 mt-1">Total Campaigns</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+      <p class="text-3xl font-bold text-green-600">
+        {% with open_count=0 %}
+        {% for c in campaigns %}{% if c.status == 'open' %}{{ forloop.counter }}{% endif %}{% endfor %}
+        {% endwith %}
+      </p>
+      <p class="text-sm text-gray-500 mt-1">Open</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center">
+      <p class="text-3xl font-bold text-violet-600">
+        {% for c in campaigns %}{% if c.status == 'completed' %}{{ forloop.counter }}{% endif %}{% endfor %}
+      </p>
+      <p class="text-sm text-gray-500 mt-1">Completed</p>
+    </div>
+  </div>
+
+  <!-- Campaigns list -->
   <div class="space-y-4">
-    {% for app in applications %}
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+    {% for campaign in campaigns %}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:border-violet-200 transition-all">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex items-start gap-4">
-          <!-- Brand logo -->
-          {% if app.campaign.brand.logo %}
-          <img src="{{ app.campaign.brand.logo.url }}"
-            class="w-12 h-12 rounded-xl object-cover flex-shrink-0" alt="">
-          {% else %}
-          <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center flex-shrink-0">
-            <span class="text-white font-bold">
-              {{ app.campaign.brand.company_name|first|upper }}
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-2">
+            <h2 class="font-bold text-gray-900 text-lg">{{ campaign.title }}</h2>
+            <span class="px-3 py-1 rounded-full text-xs font-medium
+              {% if campaign.status == 'open' %}bg-green-100 text-green-700
+              {% elif campaign.status == 'ongoing' %}bg-blue-100 text-blue-700
+              {% elif campaign.status == 'completed' %}bg-gray-100 text-gray-600
+              {% elif campaign.status == 'paused' %}bg-yellow-100 text-yellow-700
+              {% else %}bg-red-100 text-red-700{% endif %}">
+              {{ campaign.status|title }}
             </span>
           </div>
-          {% endif %}
-          <div>
-            <a href="/campaigns/{{ app.campaign.pk }}/"
-              class="font-bold text-gray-900 text-lg hover:text-violet-600 transition-colors">
-              {{ app.campaign.title }}
-            </a>
-            <p class="text-sm text-violet-600 font-medium mt-0.5">
-              {{ app.campaign.brand.company_name }}
-            </p>
-            <div class="flex items-center gap-4 mt-1 text-xs text-gray-500">
-              <span>💰 ${{ app.campaign.budget }}</span>
-              <span>📅 {{ app.campaign.deadline }}</span>
-              {% if app.proposed_rate %}
-              <span>🎯 Your rate: ${{ app.proposed_rate }}</span>
-              {% endif %}
-            </div>
-            {% if app.message %}
-            <p class="text-sm text-gray-600 mt-2 bg-gray-50 rounded-xl px-3 py-2">
-              "{{ app.message|truncatechars:100 }}"
-            </p>
+          <p class="text-sm text-gray-600 mb-3">{{ campaign.description|truncatechars:120 }}</p>
+          <div class="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+            <span class="flex items-center gap-1">
+              💰 <strong class="text-gray-700">₹{{ campaign.budget }}</strong> budget
+            </span>
+            <span class="flex items-center gap-1">
+              📅 Deadline: <strong class="text-gray-700">{{ campaign.deadline }}</strong>
+            </span>
+            <span class="flex items-center gap-1">
+              👥 <strong class="text-gray-700">{{ campaign.applications.count }}</strong> applications
+            </span>
+            <span class="flex items-center gap-1">
+              🎯 <strong class="text-gray-700">{{ campaign.influencer_count }}</strong> creators needed
+            </span>
+            {% if campaign.required_niche %}
+            <span class="flex items-center gap-1 capitalize">
+              ✨ {{ campaign.required_niche }}
+            </span>
             {% endif %}
           </div>
         </div>
 
-        <div class="flex flex-col items-end gap-3 flex-shrink-0">
-          <span class="px-4 py-1.5 rounded-full text-sm font-semibold
-            {% if app.status == 'pending' %}bg-yellow-100 text-yellow-700
-            {% elif app.status == 'accepted' %}bg-green-100 text-green-700
-            {% elif app.status == 'rejected' %}bg-red-100 text-red-700
-            {% elif app.status == 'negotiating' %}bg-blue-100 text-blue-700
-            {% else %}bg-gray-100 text-gray-600{% endif %}">
-            {% if app.status == 'pending' %}⏳ Pending
-            {% elif app.status == 'accepted' %}✅ Accepted
-            {% elif app.status == 'rejected' %}❌ Rejected
-            {% elif app.status == 'negotiating' %}🔄 Negotiating
-            {% else %}{{ app.status|title }}{% endif %}
-          </span>
-          <p class="text-xs text-gray-400">Applied {{ app.created_at|date:"M d, Y" }}</p>
-          {% if app.status == 'accepted' %}
-          <a href="/messaging/start/{{ app.campaign.brand.user.pk }}/"
-            class="btn-primary text-xs py-2 px-4">
-            💬 Message Brand
+        <!-- Actions -->
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <a href="/campaigns/{{ campaign.pk }}/"
+            class="px-4 py-2 bg-violet-100 text-violet-700 rounded-xl text-sm font-medium hover:bg-violet-200 transition-colors">
+            View
           </a>
+          <a href="/messaging/"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors">
+            💬 Messages
+          </a>
+        </div>
+      </div>
+
+      <!-- Applications preview -->
+      {% if campaign.applications.count > 0 %}
+      <div class="mt-4 pt-4 border-t border-gray-100">
+        <p class="text-xs font-semibold text-gray-500 mb-2">Recent Applicants</p>
+        <div class="flex items-center gap-2">
+          {% for app in campaign.applications.all|slice:":5" %}
+          <a href="/influencers/{{ app.influencer.pk }}/"
+            class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg hover:bg-violet-50 transition-colors">
+            <div class="w-5 h-5 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <span class="text-white text-xs font-bold">
+                {{ app.influencer.user.first_name|first|upper }}
+              </span>
+            </div>
+            <span class="text-xs text-gray-700 font-medium">
+              {% if app.influencer.user.first_name %}
+                {{ app.influencer.user.first_name }}
+              {% else %}
+                {{ app.influencer.user.username }}
+              {% endif %}
+            </span>
+            <span class="text-xs px-1.5 py-0.5 rounded-full
+              {% if app.status == 'pending' %}bg-yellow-100 text-yellow-700
+              {% elif app.status == 'accepted' %}bg-green-100 text-green-700
+              {% else %}bg-gray-100 text-gray-500{% endif %}">
+              {{ app.status|title }}
+            </span>
+          </a>
+          {% endfor %}
+          {% if campaign.applications.count > 5 %}
+          <span class="text-xs text-gray-400">+{{ campaign.applications.count|add:"-5" }} more</span>
           {% endif %}
         </div>
       </div>
+      {% endif %}
     </div>
+
     {% empty %}
     <div class="text-center py-20 text-gray-400">
-      <p class="text-6xl mb-4">📋</p>
-      <p class="text-lg font-medium text-gray-600">No applications yet</p>
-      <p class="text-sm mt-2 mb-6">Find campaigns that match your niche and start applying</p>
-      <a href="/campaigns/" class="btn-primary inline-block">Browse Campaigns</a>
+      <p class="text-6xl mb-4">📣</p>
+      <p class="text-xl font-medium text-gray-600">No campaigns yet</p>
+      <p class="text-sm mt-2 mb-6">Create your first campaign and start connecting with creators</p>
+      <a href="/campaigns/create/" class="btn-primary inline-block">
+        Create Your First Campaign
+      </a>
     </div>
     {% endfor %}
   </div>
+
 </div>
 {% endblock %}

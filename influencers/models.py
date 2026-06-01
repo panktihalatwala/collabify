@@ -22,7 +22,7 @@ NICHE_CHOICES = [
 PLATFORM_CHOICES = [
     ('instagram', 'Instagram'),
     ('youtube', 'YouTube'),
-    ('tiktok', 'TikTok'),
+    
     ('twitter', 'X (Twitter)'),
     ('linkedin', 'LinkedIn'),
     ('facebook', 'Facebook'),
@@ -35,11 +35,10 @@ class InfluencerProfile(models.Model):
     engagement_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     collab_price_min = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     collab_price_max = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    languages = models.CharField(max_length=200, blank=True, default='English')
+    languages = models.CharField(max_length=200, blank=True, default='Hindi, English')
     cover_image = models.ImageField(upload_to='influencer_covers/', blank=True, null=True)
     instagram_url = models.URLField(blank=True)
     youtube_url = models.URLField(blank=True)
-    tiktok_url = models.URLField(blank=True)
     twitter_url = models.URLField(blank=True)
     linkedin_url = models.URLField(blank=True)
     website_url = models.URLField(blank=True)
