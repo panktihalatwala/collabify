@@ -66,9 +66,30 @@
 | **Real-time** | Django Channels, WebSockets |
 | **Charts** | Chart.js |
 | **Auth** | Django Authentication, Role-based permissions |
-| **API** | Django REST Framework |
+| **Architecture** | MVT Pattern, Django ORM |
 | **Storage** | WhiteNoise, Pillow |
 
 ---
 
 ## 📁 Project Structure
+
+```
+collabify_project/
+│
+├── collabify/                  # Main Django project settings
+├── accounts/                   # Authentication & users
+├── influencers/                # Creator management
+├── brands/                     # Brand management
+├── campaigns/                  # Campaign system
+├── messaging/                  # Real-time chat
+├── notifications/              # Notification system
+├── reviews/                    # Ratings & reviews
+├── reports/                    # User reporting
+├── dashboard/                  # Analytics dashboards
+├── templates/                  # All HTML templates
+├── static/                     # Static assets
+├── media/                      # User uploaded files (gitignored)
+├── manage.py                   # Django management commands
+├── seed.py                     # Demo data seeder
+└── .gitignore
+```
