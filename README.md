@@ -61,13 +61,12 @@
 | Layer | Technology |
 |-------|-----------|
 | **Backend** | Python 3.14, Django 6.0 |
-| **Frontend** | HTML5, Tailwind CSS, JavaScript |
-| **Database** | SQLite (dev) → PostgreSQL (prod) |
-| **Real-time** | Django Channels, WebSockets |
+| **Frontend** | HTML5,Bootstrap 5, CSS |
+| **Database** | SQLite |
 | **Charts** | Chart.js |
 | **Auth** | Django Authentication, Role-based permissions |
-| **Architecture** | MVT Pattern, Django ORM |
-| **Storage** | WhiteNoise, Pillow |
+| **fonts** | Google fonts |
+| **Storage** | Pillow |
 
 ---
 
