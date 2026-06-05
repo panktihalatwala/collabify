@@ -27,7 +27,8 @@
             <div class="flex-1 pt-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">{{profile.user.get_full_name|default:profile.user.username }}</h1>
+                        <h1 class="text-2xl font-bold text-gray-900">
+                            {{profile.user.get_full_name|default:profile.user.username }}</h1>
                         <p class="text-violet-600 font-medium capitalize">{{ profile.niche }} Creator</p>
                         {% if profile.user.location %}<p class="text-sm text-gray-500">📍 {{ profile.user.location }}
                         </p>{% endif %}
@@ -94,7 +95,7 @@
                 {% if profile.youtube_url %}<a href="{{ profile.youtube_url }}" target="_blank"
                     class="px-4 py-2 bg-red-100 text-red-700 rounded-xl text-sm font-medium hover:bg-red-200 transition-colors">▶️
                     YouTube</a>{% endif %}
-                
+
                 {% if profile.twitter_url %}<a href="{{ profile.twitter_url }}" target="_blank"
                     class="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl text-sm font-medium hover:bg-blue-200 transition-colors">🐦
                     Twitter</a>{% endif %}
@@ -103,7 +104,40 @@
                     LinkedIn</a>{% endif %}
             </div>
         </div>
-
+        <!-- Portfolio -->
+        {% if profile.portfolio.all %}
+        <div class="mt-6 pt-6 border-t border-gray-100">
+            <h2 class="font-bold text-gray-900 text-lg mb-4">
+                Portfolio ({{ profile.portfolio.count }})
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {% for item in profile.portfolio.all %}
+                <div class="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
+                    {% if item.image %}
+                    <img src="{{ item.image.url }}" class="w-full h-36 object-cover" alt="{{ item.title }}">
+                    {% else %}
+                    <div
+                        class="w-full h-36 bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
+                        <p class="text-3xl">🔗</p>
+                    </div>
+                    {% endif %}
+                    <div class="p-3">
+                        <p class="font-semibold text-gray-900 text-sm">{{ item.title }}</p>
+                        {% if item.description %}
+                        <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ item.description }}</p>
+                        {% endif %}
+                        {% if item.link_url %}
+                        <a href="{{ item.link_url }}" target="_blank"
+                            class="text-xs text-violet-600 hover:underline mt-1 inline-block">
+                            View →
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
         <!-- Reviews -->
         <div class="mt-6 pt-6 border-t border-gray-100">
             <div class="flex items-center justify-between mb-4">

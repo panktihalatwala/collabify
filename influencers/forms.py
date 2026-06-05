@@ -23,3 +23,26 @@ class InfluencerProfileForm(forms.ModelForm):
             'linkedin_url': forms.URLInput(attrs={'class': INPUT_CLASS, 'placeholder': 'https://linkedin.com/...'}),
             'website_url': forms.URLInput(attrs={'class': INPUT_CLASS, 'placeholder': 'https://yoursite.com'}),
         }
+
+from .models import PortfolioItem
+
+class PortfolioItemForm(forms.ModelForm):
+    class Meta:
+        model = PortfolioItem
+        fields = ['title', 'description', 'media_type', 'image', 'link_url']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': INPUT_CLASS,
+                'placeholder': 'e.g. Nike Summer Campaign 2024'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white/80 resize-none',
+                'rows': 3,
+                'placeholder': 'Describe this project...'
+            }),
+            'media_type': forms.Select(attrs={'class': INPUT_CLASS}),
+            'link_url': forms.URLInput(attrs={
+                'class': INPUT_CLASS,
+                'placeholder': 'https://instagram.com/p/...'
+            }),
+        }

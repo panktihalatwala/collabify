@@ -131,16 +131,19 @@
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {% if unread_count %}<span
-              class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">{{ unread_count }}</span>{% endif %}
+              class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">{{
+              unread_count }}</span>{% endif %}
           </a>
           <div class="relative group">
             <button class="flex items-center gap-2 p-1 rounded-xl hover:bg-gray-100 transition-colors">
               {% if user.avatar %}
               <img src="{{ user.avatar.url }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-violet-200" alt="">
               {% else %}
-              <div
+              <div <div
                 class="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span class="text-white text-sm font-semibold">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+                <span class="text-white text-sm font-semibold">
+                  {% if user.first_name %}{{ user.first_name|first|upper }}{% endif %}{% if user.last_name %}{{user.last_name|first|upper }}{% endif %}{% if not user.first_name and not user.last_name %}{{user.username|first|upper }}{% endif %}
+                </span>
               </div>
               {% endif %}
               <span class="text-sm font-medium text-gray-700 hidden md:block">{{ user.get_full_name }}</span>
@@ -151,7 +154,8 @@
                 <div class="px-3 py-2 border-b border-gray-100 mb-1">
                   <p class="text-xs text-gray-500">Signed in as</p>
                   <p class="text-sm font-semibold text-gray-800">{{ user.username }}</p>
-                  <span class="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full capitalize">{{ user.role }}</span>
+                  <span class="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full capitalize">{{ user.role
+                    }}</span>
                 </div>
 
                 {% if user.role == 'influencer' %}
@@ -162,6 +166,10 @@
                 <a href="/influencers/edit/"
                   class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
                   ✏️ Edit Profile
+                </a>
+                <a href="/influencers/portfolio/"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
+                  🎨 My Portfolio
                 </a>
                 <a href="/campaigns/my/"
                   class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">

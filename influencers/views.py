@@ -82,3 +82,46 @@ def edit_profile(request):
     else:
         form = InfluencerProfileForm(instance=profile)
     return render(request, 'influencers/edit_profile.html', {'form': form, 'profile': profile})
+
+from .forms import InfluencerProfileForm, PortfolioItemForm
+from .models import PortfolioItem
+
+@login_required
+def portfolio_add(request):
+    if request.user.role != 'influencer':
+        return redirect('landing')
+    try:
+        profile = request.user.influencer_profile
+    except:
+        return redirect('influencers:create_profile')
+
+    if request.method == 'POST':
+        form = PortfolioItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.influencer = profile
+            item.save()
+            messages.success(request, 'Portfolio item added!')
+            return redirect('influencers:portfolio')
+    else:
+        form = PortfolioItemForm()
+    return render(request, 'influencers/portfolio_add.html', {'form': form})
+
+@login_required
+def portfolio_delete(request, pk):
+    item = get_object_or_404(PortfolioItem, pk=pk, influencer__user=request.user)
+    item.delete()
+    messages.success(request, 'Portfolio item deleted.')
+    return redirect('influencers:portfolio')
+
+@login_required
+def portfolio_list(request):
+    try:
+        profile = request.user.influencer_profile
+    except:
+        return redirect('influencers:create_profile')
+    items = profile.portfolio.all().order_by('-created_at')
+    return render(request, 'influencers/portfolio.html', {
+        'profile': profile,
+        'items': items
+    })

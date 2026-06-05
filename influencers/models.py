@@ -52,8 +52,16 @@ class InfluencerProfile(models.Model):
         return f"{self.user.username} - {self.niche}"
 
 class PortfolioItem(models.Model):
-    MEDIA_TYPES = [('image', 'Image'), ('video', 'Video'), ('link', 'Link')]
-    influencer = models.ForeignKey(InfluencerProfile, on_delete=models.CASCADE, related_name='portfolio')
+    MEDIA_TYPES = [
+        ('image', 'Image'),
+        ('video', 'Video'),
+        ('link', 'Link')
+    ]
+    influencer = models.ForeignKey(
+        InfluencerProfile,
+        on_delete=models.CASCADE,
+        related_name='portfolio'
+    )
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     media_type = models.CharField(max_length=10, choices=MEDIA_TYPES, default='image')
