@@ -15,4 +15,5 @@ urlpatterns = [
     path('reviews/', include('reviews.urls')),
     path('reports/', include('reports.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('payments/', include('payments.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

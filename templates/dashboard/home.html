@@ -165,51 +165,80 @@
     </div>
 
     <!-- Collaboration Requests -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      <h2 class="font-bold text-gray-900 text-lg mb-5">Collaboration Requests</h2>
-      {% for req in collab_requests %}
-      <div class="mb-4 p-4 bg-gray-50 rounded-xl">
-        <div class="flex items-center justify-between mb-2">
-          <p class="font-semibold text-gray-800 text-sm">{{ req.brand.company_name }}</p>
-          <span class="text-sm font-bold text-violet-600">₹{{ req.payment_amount }}</span>
-        </div>
-        <p class="text-xs text-gray-500 mb-3">Deadline: {{ req.deadline }}</p>
-        {% if req.status == 'pending' %}
-        <form method="post" action="/campaigns/collab/{{ req.pk }}/respond/">
-          {% csrf_token %}
-          <div class="flex gap-2">
-            <button name="action" value="accept"
-              class="flex-1 py-2 bg-green-500 text-white text-xs rounded-lg font-semibold hover:bg-green-600 transition-colors">
-              Accept
-            </button>
-            <button name="action" value="reject"
-              class="flex-1 py-2 bg-red-100 text-red-600 text-xs rounded-lg font-semibold hover:bg-red-200 transition-colors">
-              Reject
-            </button>
-            <a href="/messaging/start/{{ req.brand.user.pk }}/"
-              class="flex-1 py-2 bg-violet-100 text-violet-600 text-xs rounded-lg font-semibold hover:bg-violet-200 transition-colors text-center">
-              Chat
-            </a>
-          </div>
-        </form>
-        {% else %}
-        <span class="px-3 py-1 rounded-full text-xs font-medium
-          {% if req.status == 'accepted' %}bg-green-100 text-green-700
-          {% elif req.status == 'rejected' %}bg-red-100 text-red-700
-          {% else %}bg-blue-100 text-blue-700{% endif %}">
-          {{ req.status|title }}
-        </span>
-        {% endif %}
-      </div>
-      {% empty %}
-      <div class="text-center py-8 text-gray-400">
-        <p class="text-4xl mb-2">🤝</p>
-        <p class="text-sm">No requests yet</p>
-      </div>
-      {% endfor %}
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+  <h2 class="font-bold text-gray-900 text-lg mb-5">Collaboration Requests</h2>
+  {% for req in collab_requests %}
+  <div class="mb-4 p-4 bg-gray-50 rounded-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="font-semibold text-gray-800 text-sm">{{ req.brand.company_name }}</p>
+      <span class="text-sm font-bold text-violet-600">₹{{ req.payment_amount }}</span>
     </div>
-  </div>
+    <p class="text-xs text-gray-500 mb-3">Deadline: {{ req.deadline }}</p>
 
+    {% if req.status == 'pending' %}
+    <form method="post" action="/campaigns/collab/{{ req.pk }}/respond/">
+      {% csrf_token %}
+      <div class="flex gap-2">
+        <button name="action" value="accept"
+          class="flex-1 py-2 bg-green-500 text-white text-xs rounded-lg font-semibold hover:bg-green-600 transition-colors">
+          Accept
+        </button>
+        <button name="action" value="reject"
+          class="flex-1 py-2 bg-red-100 text-red-600 text-xs rounded-lg font-semibold hover:bg-red-200 transition-colors">
+          Reject
+        </button>
+        <a href="/messaging/start/{{ req.brand.user.pk }}/"
+          class="flex-1 py-2 bg-violet-100 text-violet-600 text-xs rounded-lg font-semibold hover:bg-violet-200 transition-colors text-center">
+          Chat
+        </a>
+      </div>
+    </form>
+
+    {% elif req.status == 'accepted' %}
+    <div class="flex gap-2">
+      <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+        ✅ Accepted
+      </span>
+      <a href="/payments/{{ req.pk }}/"
+        class="flex-1 py-2 bg-violet-600 text-white text-xs rounded-lg font-semibold hover:bg-violet-700 transition-colors text-center">
+        💰 View Payment
+      </a>
+      <a href="/messaging/start/{{ req.brand.user.pk }}/"
+        class="px-3 py-2 bg-violet-100 text-violet-600 text-xs rounded-lg font-semibold hover:bg-violet-200 transition-colors text-center">
+        Chat
+      </a>
+    </div>
+
+    {% elif req.status == 'completed' %}
+    <div class="flex items-center gap-2">
+      <span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+        ✅ Completed
+      </span>
+      <a href="/payments/{{ req.pk }}/"
+        class="text-xs text-violet-600 font-medium hover:underline">
+        View Transaction →
+      </a>
+    </div>
+
+    {% elif req.status == 'rejected' %}
+    <span class="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+      ❌ Rejected
+    </span>
+
+    {% else %}
+    <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+      {{ req.status|title }}
+    </span>
+    {% endif %}
+
+  </div>
+  {% empty %}
+  <div class="text-center py-8 text-gray-400">
+    <p class="text-4xl mb-2">🤝</p>
+    <p class="text-sm">No requests yet</p>
+  </div>
+  {% endfor %}
+</div>
   <!-- Quick Actions -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
     <a href="/campaigns/" class="card-hover bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-5 text-white">
@@ -223,50 +252,63 @@
       <p class="text-sm text-gray-500 mt-1">Keep your profile updated</p>
     </a>
     <a href="/messaging/" class="card-hover bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-      <p class="text-2xl mb-2">💬</p>
-      <p class="font-bold text-gray-900">Messages</p>
-      <p class="text-sm text-gray-500 mt-1">Chat with brands</p>
+  <p class="text-2xl mb-2">💬</p>
+  <p class="font-bold text-gray-900">Messages</p>
+  <p class="text-sm text-gray-500 mt-1">Chat with brands</p>
+</a>
+<a href="/payments/history/" class="card-hover bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+  <p class="text-2xl mb-2">💳</p>
+  <p class="font-bold text-gray-900">Earnings</p>
+  <p class="text-sm text-gray-500 mt-1">View payment history</p>
+</a>
     </a>
   </div>
 
-  {% elif user.role == 'brand' %}
-  <!-- ===== BRAND DASHBOARD ===== -->
+ {% elif user.role == 'brand' %}
+<!-- ===== BRAND DASHBOARD ===== -->
 
-  <!-- Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
-    <div class="bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl p-5 text-white">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-sm opacity-80 font-medium">Total Campaigns</p>
-        <span class="text-2xl">📣</span>
-      </div>
-      <p class="text-3xl font-bold">{{ total_campaigns }}</p>
-      <p class="text-xs opacity-70 mt-1">{{ open_campaigns }} currently open</p>
+<!-- Stats -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+  <div class="bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl p-5 text-white">
+    <div class="flex items-center justify-between mb-3">
+      <p class="text-sm opacity-80 font-medium">Total Campaigns</p>
+      <span class="text-2xl">📣</span>
     </div>
-    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-sm text-gray-500 font-medium">Applications</p>
-        <span class="text-2xl">📋</span>
-      </div>
-      <p class="text-3xl font-bold text-gray-900">{{ total_applications }}</p>
-      <p class="text-xs text-green-600 mt-1">Across all campaigns</p>
-    </div>
-    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-sm text-gray-500 font-medium">Requests Sent</p>
-        <span class="text-2xl">🤝</span>
-      </div>
-      <p class="text-3xl font-bold text-gray-900">{{ sent_requests|length }}</p>
-      <p class="text-xs text-blue-600 mt-1">To creators</p>
-    </div>
-    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-sm text-gray-500 font-medium">Open Campaigns</p>
-        <span class="text-2xl">🟢</span>
-      </div>
-      <p class="text-3xl font-bold text-gray-900">{{ open_campaigns }}</p>
-      <p class="text-xs text-violet-600 mt-1">Accepting applications</p>
-    </div>
+    <p class="text-3xl font-bold">{{ total_campaigns }}</p>
+    <p class="text-xs opacity-70 mt-1">{{ open_campaigns }} currently open</p>
   </div>
+
+  <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+    <div class="flex items-center justify-between mb-3">
+      <p class="text-sm text-gray-500 font-medium">Applications</p>
+      <span class="text-2xl">📋</span>
+    </div>
+    <p class="text-3xl font-bold text-gray-900">{{ total_applications }}</p>
+    <p class="text-xs text-green-600 mt-1">Across all campaigns</p>
+  </div>
+
+  <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+    <div class="flex items-center justify-between mb-3">
+      <p class="text-sm text-gray-500 font-medium">Requests Sent</p>
+      <span class="text-2xl">🤝</span>
+    </div>
+    <p class="text-3xl font-bold text-gray-900">{{ sent_requests|length }}</p>
+    <p class="text-xs text-blue-600 mt-1">
+      {{ accepted_requests }} accepted
+    </p>
+  </div>
+
+  <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-5 text-white">
+    <div class="flex items-center justify-between mb-3">
+      <p class="text-sm opacity-80 font-medium">Total Paid</p>
+      <span class="text-2xl">💰</span>
+    </div>
+    <p class="text-3xl font-bold">₹{{ total_paid|floatformat:0 }}</p>
+    <p class="text-xs opacity-70 mt-1">
+      <a href="/payments/history/" class="underline hover:opacity-80">View history</a>
+    </p>
+  </div>
+</div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 

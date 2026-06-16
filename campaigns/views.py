@@ -5,7 +5,8 @@ from django.db.models import Q
 from .models import Campaign, CampaignApplication, CollaborationRequest
 from .forms import CampaignForm, ApplicationForm, CollaborationRequestForm
 from brands.models import BrandProfile
-from influencers.models import InfluencerProfile
+from influencers.models import InfluencerProfile 
+from .models import Campaign, CampaignApplication, CollaborationRequest, BookmarkedCampaign
 
 
 def campaign_list(request):
@@ -202,3 +203,96 @@ def respond_collab(request, pk):
             collab.save()
             messages.success(request, 'Counter offer sent!')
     return redirect('dashboard:home')
+
+@login_required
+def edit_campaign(request, pk):
+    campaign = get_object_or_404(Campaign, pk=pk)
+    if campaign.brand.user != request.user:
+        messages.error(request, 'Not authorized.')
+        return redirect('campaigns:detail', pk=pk)
+    if request.method == 'POST':
+        form = CampaignForm(request.POST, request.FILES, instance=campaign)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Campaign updated successfully!')
+            return redirect('campaigns:detail', pk=campaign.pk)
+    else:
+        form = CampaignForm(instance=campaign)
+    return render(request, 'campaigns/edit.html', {
+        'form': form,
+        'campaign': campaign
+    })
+
+
+@login_required
+def delete_campaign(request, pk):
+    campaign = get_object_or_404(Campaign, pk=pk)
+    if campaign.brand.user != request.user:
+        messages.error(request, 'Not authorized.')
+        return redirect('campaigns:detail', pk=pk)
+    if request.method == 'POST':
+        campaign.delete()
+        messages.success(request, 'Campaign deleted successfully.')
+        return redirect('campaigns:my_campaigns')
+    return render(request, 'campaigns/delete_confirm.html', {
+        'campaign': campaign
+    })
+
+
+@login_required
+def change_campaign_status(request, pk):
+    campaign = get_object_or_404(Campaign, pk=pk)
+    if campaign.brand.user != request.user:
+        messages.error(request, 'Not authorized.')
+        return redirect('campaigns:detail', pk=pk)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'pause':
+            campaign.status = 'paused'
+            messages.info(request, 'Campaign paused.')
+        elif action == 'reopen':
+            campaign.status = 'open'
+            messages.success(request, 'Campaign reopened!')
+        elif action == 'complete':
+            campaign.status = 'completed'
+            messages.success(request, 'Campaign marked as completed!')
+        elif action == 'ongoing':
+            campaign.status = 'ongoing'
+            messages.success(request, 'Campaign marked as ongoing!')
+        campaign.save()
+    return redirect('campaigns:my_campaigns')
+
+@login_required
+def toggle_bookmark_campaign(request, pk):
+    from django.http import JsonResponse
+    if request.user.role != 'influencer':
+        return JsonResponse({'error': 'Influencers only'}, status=403)
+    try:
+        influencer = request.user.influencer_profile
+    except:
+        return JsonResponse({'error': 'No profile'}, status=403)
+    campaign = get_object_or_404(Campaign, pk=pk)
+    bookmark, created = BookmarkedCampaign.objects.get_or_create(
+        influencer=influencer,
+        campaign=campaign
+    )
+    if not created:
+        bookmark.delete()
+        return JsonResponse({'bookmarked': False})
+    return JsonResponse({'bookmarked': True})
+
+
+@login_required
+def saved_campaigns(request):
+    if request.user.role != 'influencer':
+        return redirect('campaigns:list')
+    try:
+        influencer = request.user.influencer_profile
+    except:
+        return redirect('influencers:create_profile')
+    bookmarks = BookmarkedCampaign.objects.filter(
+        influencer=influencer
+    ).select_related('campaign__brand').order_by('-created_at')
+    return render(request, 'campaigns/saved_campaigns.html', {
+        'bookmarks': bookmarks
+    })

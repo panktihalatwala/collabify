@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Delete Campaign — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-16">
+  <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 text-center">
+
+    <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+      <span class="text-4xl">🗑️</span>
+    </div>
+
+    <h1 class="text-2xl font-bold text-gray-900 mb-3">Delete Campaign?</h1>
+    <p class="text-gray-600 mb-2">
+      Are you sure you want to delete
+      <span class="font-semibold text-gray-900">"{{ campaign.title }}"</span>?
+    </p>
+    <p class="text-sm text-red-500 mb-8">
+      This action cannot be undone. All applications will also be deleted.
+    </p>
+
+    <div class="flex gap-3 justify-center">
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit"
+          class="px-8 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">
+          Yes, Delete
+        </button>
+      </form>
+      <a href="/campaigns/{{ campaign.pk }}/"
+        class="px-8 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">
+        Cancel
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

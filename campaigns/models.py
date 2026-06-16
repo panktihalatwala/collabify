@@ -67,3 +67,22 @@ class CollaborationRequest(models.Model):
 
     def __str__(self):
         return f"{self.brand.company_name} → {self.influencer.user.username}"
+    
+class BookmarkedCampaign(models.Model):
+    influencer = models.ForeignKey(
+        'influencers.InfluencerProfile',
+        on_delete=models.CASCADE,
+        related_name='bookmarked_campaigns'
+    )
+    campaign = models.ForeignKey(
+        Campaign,
+        on_delete=models.CASCADE,
+        related_name='bookmarked_by'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('influencer', 'campaign')
+
+    def __str__(self):
+        return f"{self.influencer.user.username} saved {self.campaign.title}"

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Payment Overview — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+
+  <a href="/dashboard/" class="inline-flex items-center gap-2 text-gray-500 hover:text-violet-600 text-sm font-medium mb-6 transition-colors">
+    ← Back to Dashboard
+  </a>
+
+  <h1 class="text-3xl font-bold text-gray-900 mb-8">Payment Overview</h1>
+
+  <!-- Collaboration details card -->
+  <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 mb-6">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <h2 class="font-bold text-gray-900 text-lg">Collaboration Details</h2>
+        <p class="text-sm text-gray-500 mt-0.5">ID: #{{ collab.pk }}</p>
+      </div>
+      <span class="px-4 py-1.5 rounded-full text-sm font-semibold
+        {% if collab.status == 'accepted' %}bg-blue-100 text-blue-700
+        {% elif collab.status == 'completed' %}bg-green-100 text-green-700
+        {% else %}bg-gray-100 text-gray-600{% endif %}">
+        {{ collab.status|title }}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="bg-gray-50 rounded-xl p-4">
+        <p class="text-xs text-gray-500 mb-1">Brand</p>
+        <p class="font-bold text-gray-900">{{ collab.brand.company_name }}</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-4">
+        <p class="text-xs text-gray-500 mb-1">Creator</p>
+        <p class="font-bold text-gray-900">
+          {% if collab.influencer.user.first_name %}
+            {{ collab.influencer.user.first_name }} {{ collab.influencer.user.last_name }}
+          {% else %}
+            {{ collab.influencer.user.username }}
+          {% endif %}
+        </p>
+      </div>
+      <div class="bg-violet-50 rounded-xl p-4">
+        <p class="text-xs text-gray-500 mb-1">Payment Amount</p>
+        <p class="font-bold text-violet-700 text-xl">₹{{ collab.payment_amount }}</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-4">
+        <p class="text-xs text-gray-500 mb-1">Deadline</p>
+        <p class="font-bold text-gray-900">{{ collab.deadline }}</p>
+      </div>
+    </div>
+
+    {% if collab.message %}
+    <div class="bg-gray-50 rounded-xl p-4">
+      <p class="text-xs text-gray-500 mb-1">Message</p>
+      <p class="text-sm text-gray-700">{{ collab.message }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Transaction card -->
+  {% if transaction %}
+  <div class="bg-white rounded-3xl border border-green-200 shadow-sm p-6 mb-6">
+    <div class="flex items-center gap-4 mb-4">
+      <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+        <span class="text-2xl">✅</span>
+      </div>
+      <div>
+        <h2 class="font-bold text-gray-900">Payment Completed</h2>
+        <p class="text-sm text-gray-500">Transaction ID: {{ transaction.transaction_id }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div class="bg-green-50 rounded-xl p-3 text-center">
+        <p class="text-xs text-gray-500 mb-1">Amount</p>
+        <p class="font-bold text-green-700 text-lg">₹{{ transaction.amount }}</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-3 text-center">
+        <p class="text-xs text-gray-500 mb-1">Status</p>
+        <p class="font-bold text-gray-900 capitalize">{{ transaction.status }}</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-3 text-center">
+        <p class="text-xs text-gray-500 mb-1">Released On</p>
+        <p class="font-bold text-gray-900 text-sm">{{ transaction.released_at|date:"M d, Y" }}</p>
+      </div>
+    </div>
+    <div class="mt-4 flex gap-3">
+      <a href="/payments/history/"
+        class="btn-primary text-sm py-2 px-5">
+        View All Transactions
+      </a>
+    </div>
+  </div>
+
+  {% elif collab.status == 'accepted' and user == collab.brand.user %}
+  <!-- Release payment -->
+  <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 mb-6">
+    <div class="flex items-center gap-4 mb-4">
+      <div class="w-12 h-12 bg-violet-100 rounded-2xl flex items-center justify-center">
+        <span class="text-2xl">💰</span>
+      </div>
+      <div>
+        <h2 class="font-bold text-gray-900">Release Payment</h2>
+        <p class="text-sm text-gray-500">Release payment to the creator once work is done</p>
+      </div>
+    </div>
+    <div class="bg-violet-50 rounded-2xl p-4 mb-4">
+      <div class="flex items-center justify-between">
+        <p class="text-gray-700 font-medium">Amount to release</p>
+        <p class="text-2xl font-bold text-violet-700">₹{{ collab.payment_amount }}</p>
+      </div>
+      <p class="text-xs text-gray-500 mt-1">
+        To: {% if collab.influencer.user.first_name %}{{ collab.influencer.user.first_name }} {{ collab.influencer.user.last_name }}{% else %}{{ collab.influencer.user.username }}{% endif %}
+      </p>
+    </div>
+    <a href="/payments/{{ collab.pk }}/release/"
+      class="btn-primary w-full text-center py-3 block">
+      💸 Release Payment of ₹{{ collab.payment_amount }}
+    </a>
+  </div>
+
+  {% elif collab.status == 'accepted' and user == collab.influencer.user %}
+  <div class="bg-white rounded-3xl border border-yellow-200 shadow-sm p-6 mb-6 text-center">
+    <p class="text-4xl mb-3">⏳</p>
+    <h2 class="font-bold text-gray-900 mb-2">Awaiting Payment</h2>
+    <p class="text-gray-600 text-sm">
+      The brand will release ₹{{ collab.payment_amount }} once your work is complete.
+    </p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

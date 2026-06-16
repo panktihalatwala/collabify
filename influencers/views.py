@@ -7,12 +7,15 @@ from .forms import InfluencerProfileForm
 
 def influencer_list(request):
     profiles = InfluencerProfile.objects.select_related('user').all()
-    niche = request.GET.get('niche', '')
-    platform = request.GET.get('platform', '')
+    
+    niche        = request.GET.get('niche', '')
+    platform     = request.GET.get('platform', '')
     min_followers = request.GET.get('min_followers', '')
     max_followers = request.GET.get('max_followers', '')
-    search = request.GET.get('search', '')
-    sort = request.GET.get('sort', '-followers_count')
+    min_price    = request.GET.get('min_price', '')
+    max_price    = request.GET.get('max_price', '')
+    search       = request.GET.get('search', '')
+    sort         = request.GET.get('sort', '-followers_count')
 
     if niche:
         profiles = profiles.filter(niche=niche)
@@ -20,14 +23,22 @@ def influencer_list(request):
         profiles = profiles.filter(followers_count__gte=int(min_followers))
     if max_followers:
         profiles = profiles.filter(followers_count__lte=int(max_followers))
+    if min_price:
+        profiles = profiles.filter(collab_price_min__gte=int(min_price))
+    if max_price:
+        profiles = profiles.filter(collab_price_max__lte=int(max_price))
     if search:
         profiles = profiles.filter(
             Q(user__username__icontains=search) |
             Q(user__first_name__icontains=search) |
-            Q(user__bio__icontains=search) |
+            Q(user__last_name__icontains=search) |
             Q(niche__icontains=search)
         )
-    valid_sorts = ['-followers_count', 'followers_count', '-avg_rating', '-engagement_rate', '-created_at']
+
+    valid_sorts = [
+        '-followers_count', 'followers_count',
+        '-avg_rating', '-engagement_rate', '-created_at'
+    ]
     if sort in valid_sorts:
         profiles = profiles.order_by(sort)
 
@@ -35,8 +46,13 @@ def influencer_list(request):
         'profiles': profiles,
         'niche_choices': NICHE_CHOICES,
         'selected_niche': niche,
+        'selected_sort': sort,
+        'selected_min_followers': min_followers,
+        'selected_max_followers': max_followers,
+        'selected_min_price': min_price,
+        'selected_max_price': max_price,
         'search': search,
-        'sort': sort,
+        'total_results': profiles.count(),
     })
 
 def influencer_detail(request, pk):

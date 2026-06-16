@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Payment Release — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-16">
+  <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-center">
+
+    <div class="w-20 h-20 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-6">
+      <span class="text-4xl">💸</span>
+    </div>
+
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Confirm Payment Release</h1>
+    <p class="text-gray-600 mb-6">
+      You are about to release payment to
+      <span class="font-semibold text-gray-900">
+        {% if collab.influencer.user.first_name %}{{ collab.influencer.user.first_name }} {{ collab.influencer.user.last_name }}{% else %}{{ collab.influencer.user.username }}{% endif %}
+      </span>
+    </p>
+
+    <div class="bg-violet-50 rounded-2xl p-6 mb-6">
+      <p class="text-4xl font-extrabold text-violet-700">₹{{ collab.payment_amount }}</p>
+      <p class="text-sm text-gray-500 mt-1">Will be credited to creator's account</p>
+    </div>
+
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mb-6">
+      <p class="text-xs text-yellow-700">
+        ⚠️ This action cannot be undone. Make sure the creator has delivered the agreed work.
+      </p>
+    </div>
+
+    <div class="flex gap-3">
+      <form method="post" class="flex-1">
+        {% csrf_token %}
+        <button type="submit"
+          class="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-bold rounded-xl hover:opacity-90 transition-opacity">
+          ✅ Confirm & Release
+        </button>
+      </form>
+      <a href="/payments/{{ collab.pk }}/"
+        class="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors text-center">
+        Cancel
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

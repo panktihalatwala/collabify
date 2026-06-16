@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Edit Campaign — Collabify{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+
+  <div class="flex items-center gap-4 mb-8">
+    <a href="/campaigns/{{ campaign.pk }}/" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </a>
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Edit Campaign</h1>
+      <p class="text-gray-600 mt-1">Update your campaign details</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="space-y-5">
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Campaign Title *</label>
+          {{ form.title }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+          {{ form.description }}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Budget (₹) *</label>
+            {{ form.budget }}
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Creators Needed</label>
+            {{ form.influencer_count }}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Required Niche</label>
+            {{ form.required_niche }}
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Deadline *</label>
+            {{ form.deadline }}
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Platforms</label>
+          {{ form.platforms }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Deliverables</label>
+          {{ form.deliverables }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Target Audience</label>
+          {{ form.target_audience }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Hashtags</label>
+          {{ form.hashtags }}
+        </div>
+
+        {% if form.errors %}
+        <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+          {% for field in form %}
+            {% for error in field.errors %}
+            <p class="text-red-600 text-sm">{{ field.label }}: {{ error }}</p>
+            {% endfor %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="btn-primary flex-1 py-3 text-base">
+            Save Changes ✅
+          </button>
+          <a href="/campaigns/{{ campaign.pk }}/" class="btn-secondary px-6 py-3 text-center">
+            Cancel
+          </a>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

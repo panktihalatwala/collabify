@@ -164,9 +164,21 @@
 
     <!-- Reviews -->
     <div class="mt-6 pt-6 border-t border-gray-100">
-      <h2 class="font-bold text-gray-900 text-lg mb-4">
-        Reviews ({{ profile.reviews.count }})
-      </h2>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-bold text-gray-900 text-lg">
+          Reviews ({{ profile.reviews.count }})
+        </h2>
+        {% if user.is_authenticated and user.role == 'influencer' %}
+        {% for req in profile.collab_requests.all %}
+        {% if req.influencer.user == user and req.status == 'completed' %}
+        <a href="/reviews/brand/{{ profile.pk }}/"
+          class="text-sm text-violet-600 font-medium hover:underline">
+          + Leave Review
+        </a>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+      </div>
       {% for review in profile.reviews.all %}
       <div class="mb-4 p-4 bg-gray-50 rounded-xl">
         <div class="flex items-center justify-between mb-2">

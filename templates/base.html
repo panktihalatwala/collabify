@@ -1,284 +1,338 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-
+<html lang="en" class="scroll-smooth" id="html-root">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Collabify — Connect. Collaborate. Grow.{% endblock %}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            violet: {
-              50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe',
-              300: '#c4b5fd', 400: '#a78bfa', 500: '#8b5cf6',
-              600: '#7c3aed', 700: '#6d28d9', 800: '#5b21b6', 900: '#4c1d95'
-            }
-          },
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Collabify — Connect. Collaborate. Grow.{% endblock %}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        violet: {
+          50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe',
+          300: '#c4b5fd', 400: '#a78bfa', 500: '#8b5cf6',
+          600: '#7c3aed', 700: '#6d28d9', 800: '#5b21b6', 900: '#4c1d95'
         }
-      }
+      },
+      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
     }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <style>
-    * {
-      font-family: 'Inter', sans-serif;
-    }
-
-    .glass {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .glass-dark {
-      background: rgba(15, 15, 15, 0.7);
-      backdrop-filter: blur(12px);
-    }
-
-    .gradient-text {
-      background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .card-hover {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .card-hover:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #7c3aed, #a855f7);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 12px;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
-    }
-
-    .btn-secondary {
-      background: white;
-      color: #7c3aed;
-      border: 2px solid #7c3aed;
-      padding: 10px 24px;
-      border-radius: 12px;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .btn-secondary:hover {
-      background: #f5f3ff;
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #a78bfa;
-      border-radius: 3px;
-    }
-  </style>
-  {% block extra_head %}{% endblock %}
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { font-family: 'Inter', sans-serif; }
+  .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+  .gradient-text { background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(124,58,237,0.15); }
+  .btn-primary { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 12px 24px; border-radius: 12px; font-weight: 600; transition: all 0.2s; display: inline-block; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(124,58,237,0.4); }
+  .btn-secondary { background: white; color: #7c3aed; border: 2px solid #7c3aed; padding: 10px 24px; border-radius: 12px; font-weight: 600; transition: all 0.2s; display: inline-block; }
+  .btn-secondary:hover { background: #f5f3ff; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; }
+  ::-webkit-scrollbar-thumb { background: #a78bfa; border-radius: 3px; }
+  /* Dark mode */
+  .dark body { background-color: #0f0f0f !important; color: #e5e7eb !important; }
+  .dark nav { background-color: #1a1a1a !important; border-color: #2d2d2d !important; }
+  .dark .bg-white { background-color: #1e1e1e !important; color: #e5e7eb !important; }
+  .dark .bg-gray-50 { background-color: #141414 !important; }
+  .dark .bg-gray-100 { background-color: #2d2d2d !important; }
+  .dark .text-gray-900 { color: #f3f4f6 !important; }
+  .dark .text-gray-800 { color: #e5e7eb !important; }
+  .dark .text-gray-700 { color: #d1d5db !important; }
+  .dark .text-gray-600 { color: #9ca3af !important; }
+  .dark .text-gray-500 { color: #6b7280 !important; }
+  .dark .border-gray-100 { border-color: #2d2d2d !important; }
+  .dark .border-gray-200 { border-color: #374151 !important; }
+  .dark input, .dark textarea, .dark select { background-color: #2d2d2d !important; color: #e5e7eb !important; border-color: #374151 !important; }
+  .dark footer { background-color: #050505 !important; }
+</style>
+{% block extra_head %}{% endblock %}
 </head>
-
 <body class="bg-gray-50 text-gray-900 antialiased">
 
-  {% if user.is_authenticated %}
-  <!-- Dashboard Navbar -->
-  <nav class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <a href="/" class="flex items-center gap-2">
-          <div
-            class="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center">
+{% if user.is_authenticated %}
+<nav class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center">
+          <span class="text-white font-bold text-sm">C</span>
+        </div>
+        <span class="font-bold text-lg gradient-text">Collabify</span>
+      </a>
+
+      <!-- Desktop Nav links -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="/dashboard/" class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Dashboard</a>
+        <a href="/campaigns/" class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Campaigns</a>
+        <a href="/influencers/" class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Creators</a>
+        <a href="/messaging/" class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Messages</a>
+      </div>
+
+      <!-- Right side -->
+      <div class="flex items-center gap-2">
+
+        <!-- Dark mode toggle -->
+        <button id="dark-toggle" class="p-2 rounded-xl hover:bg-gray-100 transition-colors" title="Toggle dark mode">
+          <span id="dark-icon">🌙</span>
+        </button>
+
+        <!-- Bell icon -->
+        <a href="/notifications/" class="relative p-2 rounded-xl hover:bg-gray-100 transition-colors">
+          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+          {% if unread_count %}
+          <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">{{ unread_count }}</span>
+          {% endif %}
+        </a>
+
+        <!-- Profile dropdown desktop -->
+        <div class="relative group hidden md:block">
+          <button class="flex items-center gap-2 p-1 rounded-xl hover:bg-gray-100 transition-colors">
+            {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-violet-200" alt="">
+            {% else %}
+            <div class="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
+              <span class="text-white text-sm font-semibold">
+                {% if user.first_name %}{{ user.first_name|first|upper }}{% endif %}{% if user.last_name %}{{ user.last_name|first|upper }}{% endif %}{% if not user.first_name and not user.last_name %}{{ user.username|first|upper }}{% endif %}
+              </span>
+            </div>
+            {% endif %}
+            <span class="text-sm font-medium text-gray-700">
+              {% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}
+            </span>
+          </button>
+          <div class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+            <div class="p-2">
+              <div class="px-3 py-2 border-b border-gray-100 mb-1">
+                <p class="text-xs text-gray-500">Signed in as</p>
+                <p class="text-sm font-semibold text-gray-800">{{ user.username }}</p>
+                <span class="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full capitalize">{{ user.role }}</span>
+              </div>
+              {% if user.role == 'influencer' %}
+              <a href="{% url 'influencers:detail' user.influencer_profile.pk %}" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">👤 My Profile</a>
+              <a href="/influencers/edit/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">✏️ Edit Profile</a>
+              <a href="/influencers/portfolio/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">🎨 My Portfolio</a>
+              <a href="/campaigns/saved/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">🔖 Saved Campaigns</a>
+              <a href="/payments/history/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">💳 Earnings</a>
+              <a href="/campaigns/my/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">📋 My Applications</a>
+              {% elif user.role == 'brand' %}
+              <a href="/brands/{{ user.brand_profile.pk }}/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">🏢 Company Profile</a>
+              <a href="/brands/edit/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">✏️ Edit Profile</a>
+              <a href="/campaigns/my/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">📣 My Campaigns</a>
+              <a href="/payments/history/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">💳 Payments</a>
+              <a href="/brands/bookmarks/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">🔖 Saved Creators</a>
+              {% endif %}
+              <a href="/messaging/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">💬 Messages</a>
+              <a href="/notifications/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">🔔 Notifications</a>
+              <a href="/dashboard/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">📊 Dashboard</a>
+              <div class="border-t border-gray-100 my-1"></div>
+              <a href="/accounts/logout/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-red-50 text-sm text-red-600">🚪 Sign out</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hamburger mobile -->
+        <button id="hamburger-btn" class="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors">
+          <svg id="hamburger-icon" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="close-icon" class="w-6 h-6 text-gray-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+    <div class="px-4 py-4 space-y-1">
+      <div class="flex items-center gap-3 px-3 py-3 bg-violet-50 rounded-2xl mb-3">
+        {% if user.avatar %}
+        <img src="{{ user.avatar.url }}" class="w-10 h-10 rounded-full object-cover" alt="">
+        {% else %}
+        <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
+          <span class="text-white font-bold">{% if user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</span>
+        </div>
+        {% endif %}
+        <div>
+          <p class="font-semibold text-gray-900 text-sm">{% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}</p>
+          <span class="text-xs px-2 py-0.5 bg-violet-200 text-violet-700 rounded-full capitalize">{{ user.role }}</span>
+        </div>
+      </div>
+      <a href="/dashboard/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">📊 Dashboard</a>
+      <a href="/campaigns/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">📣 Campaigns</a>
+      <a href="/influencers/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">🎤 Creators</a>
+      <a href="/messaging/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">💬 Messages</a>
+      <a href="/notifications/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">🔔 Notifications {% if unread_count %}<span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{{ unread_count }}</span>{% endif %}</a>
+      <div class="border-t border-gray-100 my-2"></div>
+      {% if user.role == 'influencer' %}
+      <a href="{% url 'influencers:detail' user.influencer_profile.pk %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">👤 My Profile</a>
+      <a href="/influencers/edit/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">✏️ Edit Profile</a>
+      
+      <a href="/influencers/portfolio/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">🎨 My Portfolio</a>
+      <a href="/campaigns/saved/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">🔖 Saved Campaigns</a>
+      <a href="/campaigns/my/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">📋 My Applications</a>
+      <a href="/payments/history/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">💳 Earnings</a>
+      {% elif user.role == 'brand' %}
+      <a href="/brands/{{ user.brand_profile.pk }}/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">🏢 Company Profile</a>
+      <a href="/brands/edit/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">✏️ Edit Profile</a>
+      <a href="/campaigns/my/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">📣 My Campaigns</a>
+      <a href="/payments/history/" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">💳 Payments</a>
+      <a href="/brands/bookmarks/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700">🔖 Saved Creators</a>
+      {% endif %}
+      <div class="border-t border-gray-100 my-2"></div>
+      <button onclick="toggleDark()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700 w-full text-left">
+        <span id="mobile-dark-icon">🌙</span>
+        <span id="mobile-dark-text">Dark Mode</span>
+      </button>
+      <div class="border-t border-gray-100 my-2"></div>
+      <a href="/accounts/logout/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 text-sm font-medium text-red-600">🚪 Sign out</a>
+    </div>
+  </div>
+</nav>
+{% endif %}
+
+<!-- Toast messages -->
+{% if messages %}
+<div class="fixed top-20 right-4 z-50 space-y-2" id="toast-container">
+  {% for message in messages %}
+  <div class="toast flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium max-w-sm
+    {% if message.tags == 'error' %}bg-red-500 text-white
+    {% elif message.tags == 'success' %}bg-green-500 text-white
+    {% else %}bg-violet-600 text-white{% endif %}">
+    {{ message }}
+    <button onclick="this.parentElement.remove()" class="ml-auto opacity-70 hover:opacity-100">✕</button>
+  </div>
+  {% endfor %}
+</div>
+<script>setTimeout(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); }, 4000);</script>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 py-12 mt-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="col-span-2 md:col-span-1">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center">
             <span class="text-white font-bold text-sm">C</span>
           </div>
-          <span class="font-bold text-lg gradient-text">Collabify</span>
-        </a>
-        <div class="hidden md:flex items-center gap-6">
-          <a href="/dashboard/"
-            class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Dashboard</a>
-          <a href="/campaigns/"
-            class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Campaigns</a>
-          <a href="/influencers/"
-            class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Creators</a>
-          <a href="/messaging/"
-            class="text-gray-600 hover:text-violet-600 font-medium transition-colors text-sm">Messages</a>
+          <span class="text-white font-bold text-lg">Collabify</span>
         </div>
-        <div class="flex items-center gap-3">
-          <a href="/notifications/" class="relative p-2 rounded-xl hover:bg-gray-100 transition-colors">
-            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            {% if unread_count %}<span
-              class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">{{
-              unread_count }}</span>{% endif %}
-          </a>
-          <div class="relative group">
-            <button class="flex items-center gap-2 p-1 rounded-xl hover:bg-gray-100 transition-colors">
-              {% if user.avatar %}
-              <img src="{{ user.avatar.url }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-violet-200" alt="">
-              {% else %}
-              <div <div
-                class="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span class="text-white text-sm font-semibold">
-                  {% if user.first_name %}{{ user.first_name|first|upper }}{% endif %}{% if user.last_name %}{{user.last_name|first|upper }}{% endif %}{% if not user.first_name and not user.last_name %}{{user.username|first|upper }}{% endif %}
-                </span>
-              </div>
-              {% endif %}
-              <span class="text-sm font-medium text-gray-700 hidden md:block">{{ user.get_full_name }}</span>
-            </button>
-            <div
-              class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-              <div class="p-2">
-                <div class="px-3 py-2 border-b border-gray-100 mb-1">
-                  <p class="text-xs text-gray-500">Signed in as</p>
-                  <p class="text-sm font-semibold text-gray-800">{{ user.username }}</p>
-                  <span class="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full capitalize">{{ user.role
-                    }}</span>
-                </div>
-
-                {% if user.role == 'influencer' %}
-                <a href="/influencers/edit/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  👤 My Profile
-                </a>
-                <a href="/influencers/edit/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  ✏️ Edit Profile
-                </a>
-                <a href="/influencers/portfolio/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  🎨 My Portfolio
-                </a>
-                <a href="/campaigns/my/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  📋 My Applications
-                </a>
-
-                {% elif user.role == 'brand' %}
-                <a href="/brands/edit/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  🏢 Company Profile
-                </a>
-                <a href="/brands/edit/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  ✏️ Edit Profile
-                </a>
-                <a href="/campaigns/my/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  📣 My Campaigns
-                </a>
-                {% endif %}
-
-                <a href="/messaging/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  💬 Messages
-                </a>
-                <a href="/notifications/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  🔔 Notifications
-                </a>
-                <a href="/dashboard/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 text-sm text-gray-700">
-                  📊 Dashboard
-                </a>
-
-                <div class="border-t border-gray-100 my-1"></div>
-                <a href="/accounts/logout/"
-                  class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-red-50 text-sm text-red-600">
-                  🚪 Sign out
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
+        <p class="text-sm leading-relaxed">Connect. Collaborate. Grow. The platform where brands meet creators.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3 text-sm">Platform</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/campaigns/" class="hover:text-white transition-colors">Campaigns</a></li>
+          <li><a href="/influencers/" class="hover:text-white transition-colors">Creators</a></li>
+          <li><a href="/dashboard/" class="hover:text-white transition-colors">Dashboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3 text-sm">Company</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/about/" class="hover:text-white transition-colors">About</a></li>
+          <li><a href="/contact/" class="hover:text-white transition-colors">Contact</a></li>
+          <li><a href="/faqs/" class="hover:text-white transition-colors">FAQs</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3 text-sm">Legal</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/privacy/" class="hover:text-white transition-colors">Privacy Policy</a></li>
+          <li><a href="/terms/" class="hover:text-white transition-colors">Terms of Service</a></li>
+        </ul>
       </div>
     </div>
-  </nav>
-  {% endif %}
-
-  <!-- Messages -->
-  {% if messages %}
-  <div class="fixed top-20 right-4 z-50 space-y-2" id="toast-container">
-    {% for message in messages %}
-    <div
-      class="toast flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium max-w-sm
-  {% if message.tags == 'error' %}bg-red-500 text-white{% elif message.tags == 'success' %}bg-green-500 text-white{% else %}bg-violet-600 text-white{% endif %}">
-      {{ message }}
-      <button onclick="this.parentElement.remove()" class="ml-auto opacity-70 hover:opacity-100">✕</button>
+    <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+      <p>© 2026 Collabify. All rights reserved. Made with ❤️ in India 🇮🇳</p>
     </div>
-    {% endfor %}
   </div>
-  <script>setTimeout(() => { document.querySelectorAll('.toast').forEach(t => t.remove()); }, 4000);</script>
-  {% endif %}
+</footer>
 
-  {% block content %}{% endblock %}
+<script>
+  // Dark mode
+  function applyDark(isDark) {
+    if (isDark) {
+      document.body.classList.add('dark');
+      document.documentElement.classList.add('dark');
+      document.body.style.backgroundColor = '#0f0f0f';
+      document.querySelectorAll('.bg-white').forEach(el => el.style.backgroundColor = '#1e1e1e');
+      const darkIcon = document.getElementById('dark-icon');
+      const mobileDarkIcon = document.getElementById('mobile-dark-icon');
+      const mobileDarkText = document.getElementById('mobile-dark-text');
+      if (darkIcon) darkIcon.textContent = '☀️';
+      if (mobileDarkIcon) mobileDarkIcon.textContent = '☀️';
+      if (mobileDarkText) mobileDarkText.textContent = 'Light Mode';
+    } else {
+      document.body.classList.remove('dark');
+      document.documentElement.classList.remove('dark');
+      document.body.style.backgroundColor = '';
+      document.querySelectorAll('.bg-white').forEach(el => el.style.backgroundColor = '');
+      const darkIcon = document.getElementById('dark-icon');
+      const mobileDarkIcon = document.getElementById('mobile-dark-icon');
+      const mobileDarkText = document.getElementById('mobile-dark-text');
+      if (darkIcon) darkIcon.textContent = '🌙';
+      if (mobileDarkIcon) mobileDarkIcon.textContent = '🌙';
+      if (mobileDarkText) mobileDarkText.textContent = 'Dark Mode';
+    }
+  }
 
-  <footer class="bg-gray-900 text-gray-400 py-12 mt-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-        <div class="col-span-2 md:col-span-1">
-          <div class="flex items-center gap-2 mb-4">
-            <div
-              class="w-8 h-8 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <span class="text-white font-bold text-sm">C</span>
-            </div>
-            <span class="text-white font-bold text-lg">Collabify</span>
-          </div>
-          <p class="text-sm leading-relaxed">Connect. Collaborate. Grow. The platform where brands meet creators.</p>
-        </div>
-        <div>
-          <h4 class="text-white font-semibold mb-3 text-sm">Platform</h4>
-          <ul class="space-y-2 text-sm">
-            <li><a href="/campaigns/" class="hover:text-white transition-colors">Campaigns</a></li>
-            <li><a href="/influencers/" class="hover:text-white transition-colors">Creators</a></li>
-            <li><a href="/dashboard/" class="hover:text-white transition-colors">Dashboard</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-white font-semibold mb-3 text-sm">Company</h4>
-          <ul class="space-y-2 text-sm">
-            <li><a href="/about/" class="hover:text-white transition-colors">About</a></li>
-            <li><a href="/contact/" class="hover:text-white transition-colors">Contact</a></li>
-            <li><a href="/faqs/" class="hover:text-white transition-colors">FAQs</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-white font-semibold mb-3 text-sm">Legal</h4>
-          <ul class="space-y-2 text-sm">
-            <li><a href="/privacy/" class="hover:text-white transition-colors">Privacy Policy</a></li>
-            <li><a href="/terms/" class="hover:text-white transition-colors">Terms of Service</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-        <p>© 2026 Collabify. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
+  function toggleDark() {
+    const isDark = !document.body.classList.contains('dark');
+    localStorage.setItem('collabify-dark', isDark);
+    applyDark(isDark);
+  }
 
-  {% block extra_js %}{% endblock %}
+  // Hamburger
+  function initHamburger() {
+    const btn  = document.getElementById('hamburger-btn');
+    const menu = document.getElementById('mobile-menu');
+    const hIcon = document.getElementById('hamburger-icon');
+    const cIcon = document.getElementById('close-icon');
+    if (btn) {
+      btn.addEventListener('click', function() {
+        const isOpen = !menu.classList.contains('hidden');
+        menu.classList.toggle('hidden', isOpen);
+        hIcon.classList.toggle('hidden', !isOpen);
+        cIcon.classList.toggle('hidden', isOpen);
+      });
+      menu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          menu.classList.add('hidden');
+          hIcon.classList.remove('hidden');
+          cIcon.classList.add('hidden');
+        });
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Apply saved dark mode
+    const savedDark = localStorage.getItem('collabify-dark') === 'true';
+    applyDark(savedDark);
+    // Attach dark toggle
+    const darkToggle = document.getElementById('dark-toggle');
+    if (darkToggle) darkToggle.addEventListener('click', toggleDark);
+    // Init hamburger
+    initHamburger();
+  });
+</script>
+
+{% block extra_js %}{% endblock %}
 </body>
-
 </html>

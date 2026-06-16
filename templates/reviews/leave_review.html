@@ -2,23 +2,134 @@
 {% block title %}Leave a Review — Collabify{% endblock %}
 {% block content %}
 <div class="max-w-xl mx-auto px-4 py-10">
-  <h1 class="text-3xl font-bold text-gray-900 mb-2">Leave a Review</h1>
-  <p class="text-gray-600 mb-8">Share your experience with <span class="font-semibold text-violet-600">{{ target.user.get_full_name }}</span></p>
+
+  <a href="javascript:history.back()"
+    class="inline-flex items-center gap-2 text-gray-500 hover:text-violet-600 text-sm font-medium mb-6 transition-colors">
+    ← Back
+  </a>
+
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Leave a Review</h1>
+    <p class="text-gray-600 mt-1">
+      Share your experience working with
+      <span class="font-semibold text-violet-600">{{ target_name }}</span>
+    </p>
+  </div>
+
   <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+
+    <!-- Verified badge -->
+    <div class="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-xl mb-6">
+      <span class="text-xl">✅</span>
+      <div>
+        <p class="text-sm font-semibold text-green-800">Verified Collaboration</p>
+        <p class="text-xs text-green-600">
+          You completed a collaboration with {{ target_name }}
+        </p>
+      </div>
+    </div>
+
     <form method="post">
       {% csrf_token %}
       <div class="space-y-5">
+
+        <!-- Star rating visual -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Rating *</label>
-          {{ form.rating }}
+          <label class="block text-sm font-medium text-gray-700 mb-3">
+            Your Rating *
+          </label>
+          <div class="flex gap-2 mb-3" id="star-container">
+  {% for i in "12345" %}
+  <button type="button"
+    class="star-btn text-4xl text-gray-300 hover:text-yellow-400 transition-colors"
+    data-value="{{ forloop.counter }}">
+    ★
+  </button>
+  {% endfor %}
+</div>
+          <p class="text-xs text-gray-500" id="rating-text">Click a star to rate</p>
+          <!-- Hidden select -->
+          <div class="hidden">
+            {{ form.rating }}
+          </div>
         </div>
+
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Your Feedback *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Your Feedback *
+          </label>
           {{ form.feedback }}
         </div>
-        <button type="submit" class="btn-primary w-full py-3">Submit Review ⭐</button>
+
+        {% if form.errors %}
+        <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+          {% for field in form %}
+            {% for error in field.errors %}
+            <p class="text-red-600 text-sm">{{ error }}</p>
+            {% endfor %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <button type="submit" class="btn-primary w-full py-3 text-base">
+          Submit Review ⭐
+        </button>
+
       </div>
     </form>
   </div>
+
 </div>
+
+<script>
+  const ratingLabels = {
+    1: '⭐ Poor',
+    2: '⭐⭐ Fair',
+    3: '⭐⭐⭐ Good',
+    4: '⭐⭐⭐⭐ Very Good',
+    5: '⭐⭐⭐⭐⭐ Excellent!'
+  };
+
+  function setRating(value) {
+    const select = document.querySelector('select[name="rating"]');
+    if (select) select.value = value;
+
+    document.querySelectorAll('.star-btn').forEach(btn => {
+      const btnVal = parseInt(btn.dataset.value);
+      btn.classList.toggle('text-yellow-400', btnVal <= value);
+      btn.classList.toggle('text-gray-300', btnVal > value);
+    });
+
+    document.getElementById('rating-text').textContent = ratingLabels[value];
+  }
+
+  // Attach click events via JavaScript instead of onclick attribute
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const value = parseInt(this.dataset.value);
+      setRating(value);
+    });
+
+    // Hover effect
+    btn.addEventListener('mouseenter', function() {
+      const value = parseInt(this.dataset.value);
+      document.querySelectorAll('.star-btn').forEach(b => {
+        const bVal = parseInt(b.dataset.value);
+        b.classList.toggle('text-yellow-300', bVal <= value);
+      });
+    });
+
+    btn.addEventListener('mouseleave', function() {
+      const select = document.querySelector('select[name="rating"]');
+      const currentRating = select ? parseInt(select.value) : 0;
+      document.querySelectorAll('.star-btn').forEach(b => {
+        const bVal = parseInt(b.dataset.value);
+        b.classList.toggle('text-yellow-400', bVal <= currentRating);
+        b.classList.toggle('text-yellow-300', false);
+        b.classList.toggle('text-gray-300', bVal > currentRating);
+      });
+    });
+  });
+</script>
+
 {% endblock %}
